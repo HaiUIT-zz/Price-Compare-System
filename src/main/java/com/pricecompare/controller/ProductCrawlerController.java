@@ -34,7 +34,7 @@ public class ProductCrawlerController
     }
 
     @RequestMapping(value = { "/crawler"}, method = RequestMethod.GET)
-    public String index(Model model)
+    public String index()
     {
         return "layout_admin :: mainPage(page='product-crawler', content='content', script='script')";
     }

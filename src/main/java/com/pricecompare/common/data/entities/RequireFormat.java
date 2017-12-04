@@ -21,6 +21,6 @@ public class RequireFormat
     private String format;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "require_id")
+    @JoinColumn(name = "require_id", foreignKey = @ForeignKey(name = "require_formats_fk0"))
     private CrawlingRequire crawlingRequire;
 }
