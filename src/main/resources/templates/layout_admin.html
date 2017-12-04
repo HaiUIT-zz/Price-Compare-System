@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:fragment="mainPage(page, content, script)">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Price compare system | Dashboard</title>
+    <title>Price compare system</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.7 -->
@@ -14,11 +14,8 @@
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <!-- Ionicons -->
     <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" th:href="@{/css/AdminLTE.min.css}">
-    <!-- AdminLTE Skins. Choose a skin from the css/skins
-         folder instead of downloading all of them to reduce the load. -->
-    <link rel="stylesheet" th:href="@{/css/skins/_all-skins.min.css}">
+    <!-- jquery datatable -->
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
     <!-- Morris chart -->
     <link rel="stylesheet" th:href="@{/css/morris.css}">
     <!-- jvectormap -->
@@ -29,6 +26,13 @@
     <link rel="stylesheet" th:href="@{/css/daterangepicker.css}">
     <!-- bootstrap wysihtml5 - text editor -->
     <link rel="stylesheet" th:href="@{/css/plugins/bootstrap3-wysihtml5.min.css}">
+    <!-- Select2 -->
+    <link rel="stylesheet" th:href="@{/css/select2.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/css/AdminLTE.min.css}">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+         folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" th:href="@{/css/skins/_all-skins.min.css}">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -41,7 +45,7 @@
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
-<body class="hold-transition skin-blue sidebar-mini">
+<body class="hold-transition skin-blue sidebar-mini" >
 <div class="wrapper">
     <header class="main-header">
         <!-- Logo -->
@@ -108,7 +112,7 @@
                         <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><a th:href="@{/crawler}"><i class="fa fa-circle-o"></i>Update products list</a></li>
+                        <li><a th:href="@{/product/crawler/}"><i class="fa fa-circle-o"></i>Update products list</a></li>
                     </ul>
                 </li>
 
@@ -118,8 +122,8 @@
                         <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><a th:href="@{/wrapper}"><i class="fa fa-circle-o"></i>Wrapper generator</a></li>
-                        <li><a th:href="@{/keyword}"><i class="fa fa-circle-o"></i>Keyword manager</a></li>
+                        <li><a th:href="@{/wrapper/}"><i class="fa fa-circle-o"></i>Wrapper generator</a></li>
+                        <li><a th:href="@{/keyword/}"><i class="fa fa-circle-o"></i>Keyword manager</a></li>
                     </ul>
                 </li>
 
@@ -129,8 +133,8 @@
                         <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><a th:href="@{/wrapper}"><i class="fa fa-circle-o"></i>Agent query generator</a></li>
-                        <li><a th:href="@{/keyword}"><i class="fa fa-circle-o"></i>Agent crawler</a></li>
+                        <li><a th:href="@{/agent/generator}"><i class="fa fa-circle-o"></i>Agent query generator</a></li>
+                        <li><a th:href="@{/agent/crawler}"><i class="fa fa-circle-o"></i>Agent crawler</a></li>
                     </ul>
                 </li>
             </ul>
@@ -142,7 +146,10 @@
     <div class="content-wrapper">
         <!-- Main content -->
         <section class="content">
-
+            <th:block th:if="${page != null and content != null}">
+                <th:block th:include="${page} :: ${content}">
+                </th:block>
+            </th:block>
         </section>
         <!-- /.content -->
     </div>
@@ -349,11 +356,12 @@
          immediately after the control sidebar -->
     <div class="control-sidebar-bg"></div>
 </div>
-
 <!-- jQuery 3 -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <!-- jQuery UI 1.12.1 -->
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<!-- jquery datatable -->
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 <script>
     $.widget.bridge('uibutton', $.ui.button);
@@ -381,11 +389,18 @@
 <script th:src="@{/js/jquery.slimscroll.min.js}"></script>
 <!-- FastClick -->
 <script th:src="@{/js/fastclick.js}"></script>
+<!-- Select2 -->
+<script th:src="@{/js/select2.full.min.js}"></script>
 <!-- AdminLTE App -->
 <script th:src="@{/js/adminlte.min.js}"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script th:src="@{/js/pages/dashboard.js}"></script>
 <!-- AdminLTE for demo purposes -->
 <script th:src="@{/js/demo.js}"></script>
+
+<th:block th:if="${page != null and script != null}">
+    <th:block th:include="${page} :: ${script}">
+    </th:block>
+</th:block>
 </body>
 </html>

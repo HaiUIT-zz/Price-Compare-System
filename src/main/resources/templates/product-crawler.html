@@ -1,0 +1,83 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<th:block th:fragment="content">
+    <div class="row">
+        <!-- SELECT2 EXAMPLE -->
+        <div class="box box-default">
+            <div class="box-header with-border">
+                <h3 class="box-title">Select an agent</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <select class="form-control select2" style="width: 100%;" id="agent">
+                                <option th:value="tgdd">Thegioididong</option>
+                                <option th:value="vienthonga" selected="selected">VienthongA</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" name="query" id="query" class="form-control" placeholder="Search...">
+                            <span class="input-group-btn" id="submit-search">
+                                <button type="button" class="btn btn-info btn-flat">Go!</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+
+    <th:block th:if="${products}">
+        <table id="products">
+
+        </table>
+
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-md-1 pull-right">
+                <button type="button" class="btn btn-block btn-primary"><i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save</button>
+            </div>
+        </div>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="script">
+    <script>
+        $(function () {
+            $('.select2').select2();
+
+            $('#submit-search').click(function () {
+                var agent = $('#agent').val();
+                var brand = $('#query').val();
+                window.location = '/product/crawler/' + agent + '/' + brand;
+            });
+        })
+    </script>
+
+    <th:block th:if="${products}">
+        <script th:inline="javascript">
+            var data = /*[[${products}]]*/ null;
+            console.log(data);
+
+            $("#products").DataTable({
+               data: data,
+                columns: [
+                    { data: 'name' , width: "50%"},
+                    { data: 'price' }
+                ]
+            });
+        </script>
+    </th:block>
+</th:block>
+</html>
