@@ -16,7 +16,7 @@ public class CrawlingRequire
     @Id
     @SequenceGenerator(name="crawling_requires_id_seq", sequenceName="crawling_requires_id_seq", allocationSize=1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="crawling_requires_id_seq")
-    private long id;
+    private int id;
 
     @Column(name = "code")
     private String code;

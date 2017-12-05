@@ -6,6 +6,18 @@ package com.pricecompare.common.wrappergenerator;
 * 1 = Price
 * 2 = Product name
  */
+
+import com.pricecompare.common.data.entities.CrawlingRequire;
+import com.pricecompare.common.data.reopsitories.CrawlingRequireRepository;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.catalina.LifecycleState;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+
+@Getter
+@Setter
 public class LogicalLine
 {
     private int objectId;
@@ -21,59 +33,15 @@ public class LogicalLine
         format = "";
     }
 
-    public int getObjectId()
+    public void stringToId(List<CrawlingRequire> crawlingRequireList)
     {
-        return objectId;
-    }
-
-    public void setObjectId(int objectId)
-    {
-        this.objectId = objectId;
-    }
-
-    public String getObject()
-    {
-        return object;
-    }
-
-    public void setObject(String object)
-    {
-        this.object = object;
-    }
-
-    public String getLine()
-    {
-        return line;
-    }
-
-    public void setLine(String line)
-    {
-        this.line = line;
-    }
-
-    public String getFormat()
-    {
-        return format;
-    }
-
-    public void setFormat(String format)
-    {
-        this.format = format;
-    }
-
-    public void stringToId()
-    {
-        switch (object)
+        for (CrawlingRequire crawlingRequire : crawlingRequireList)
         {
-            case "Price" :
-                objectId = 1;
-                break;
-            case "Name" :
-                objectId = 2;
-                break;
-            default:
-                objectId = 0;
-                break;
+            if (crawlingRequire.getText().equals(object))
+            {
+                objectId = crawlingRequire.getId();
+                return;
+            }
         }
     }
 }

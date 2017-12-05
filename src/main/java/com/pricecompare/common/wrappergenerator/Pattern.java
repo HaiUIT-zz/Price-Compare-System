@@ -1,9 +1,14 @@
 package com.pricecompare.common.wrappergenerator;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Getter
+@Setter
 public class Pattern
 {
     private List<Integer> pattern;
@@ -13,31 +18,6 @@ public class Pattern
     {
         endIndex = -1;
         pattern = new ArrayList<>();
-    }
-
-    public List<Integer> getPattern()
-    {
-        return pattern;
-    }
-
-    public void setPattern(List<Integer> pattern)
-    {
-        this.pattern = pattern;
-    }
-
-    public int getEndIndex()
-    {
-        return endIndex;
-    }
-
-    public int getStartIndex()
-    {
-        return pattern.size() - endIndex;
-    }
-
-    public void setEndIndex(int endIndex)
-    {
-        this.endIndex = endIndex;
     }
 
     public boolean equals(Pattern p)
@@ -58,7 +38,8 @@ public class Pattern
         return true;
     }
 
-    public Pattern clone(){
+    public Pattern clone()
+    {
         Pattern p = new Pattern();
         Collections.copy(p.pattern, this.pattern);
         p.endIndex = this.endIndex;

@@ -3,6 +3,8 @@ package com.pricecompare.common.wrappergenerator;
 import com.pricecompare.common.data.entities.CrawlingRequire;
 import com.pricecompare.common.data.entities.RequireFormat;
 import com.pricecompare.common.data.entities.RequireTerm;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
 
@@ -12,38 +14,20 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Getter
+@Setter
 public class Knowledge
 {
     private String name;
+    private long id;
     private List<String> terms;
     private List<String> formats;
 
-    public Knowledge(String name)
+    public Knowledge(String name, long id)
     {
         this.name = name;
+        this.id = id;
     }
-
-    //region Getter and Setter
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public List<String> getTerms()
-    {
-        return terms;
-    }
-
-    public List<String> getFormats()
-    {
-        return formats;
-    }
-    //endregion
 
     //region Mtehods
     public void generateDetail(CrawlingRequire require)

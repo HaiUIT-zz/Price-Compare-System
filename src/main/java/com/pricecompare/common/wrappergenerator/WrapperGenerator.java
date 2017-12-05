@@ -1,21 +1,18 @@
 package com.pricecompare.common.wrappergenerator;
 import com.pricecompare.common.data.entities.CrawlingRequire;
 import com.pricecompare.entities.Product;
+import lombok.Getter;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+@Getter
 public class WrapperGenerator
 {
     private List<LogicalLine> logicalLines;
     private List<Knowledge> knowledges;
-
-    public List<LogicalLine> getLogicalLines()
-    {
-        return logicalLines;
-    }
 
     public WrapperGenerator(List<CrawlingRequire> crawlingRequires)
     {
@@ -25,7 +22,7 @@ public class WrapperGenerator
         {
             for (CrawlingRequire require: crawlingRequires)
             {
-                knowledges.add(new Knowledge(require.getText()));
+                knowledges.add(new Knowledge(require.getText(), require.getId()));
                 knowledges.get(knowledges.size() - 1).generateDetail(require);
             }
         }
@@ -200,6 +197,11 @@ public class WrapperGenerator
             }
         }
         return freq;
+    }
+
+    private boolean validatePattern(Pattern pattern )
+    {
+        return false;
     }
     //endregion
 }
