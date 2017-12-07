@@ -43,7 +43,7 @@ public class HtmlHelper
             }
 
             temp.setFormat(format);
-            temp.stringToId();
+            temp.stringToId(knowledges);
 
             if (!(temp.getObjectId() == 0 && logicalLines.size() == 0))
             {
@@ -78,9 +78,7 @@ public class HtmlHelper
                         }
                     }
                 }
-
-                temp.stringToId();
-
+                //temp.stringToId();
                 logicalLines.add(temp);
             }
         }

@@ -7,12 +7,8 @@ package com.pricecompare.common.wrappergenerator;
 * 2 = Product name
  */
 
-import com.pricecompare.common.data.entities.CrawlingRequire;
-import com.pricecompare.common.data.reopsitories.CrawlingRequireRepository;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.catalina.LifecycleState;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -33,13 +29,13 @@ public class LogicalLine
         format = "";
     }
 
-    public void stringToId(List<CrawlingRequire> crawlingRequireList)
+    public void stringToId(List<Knowledge> knowledges)
     {
-        for (CrawlingRequire crawlingRequire : crawlingRequireList)
+        for (Knowledge knowledge : knowledges)
         {
-            if (crawlingRequire.getText().equals(object))
+            if (knowledge.getName().equals(object))
             {
-                objectId = crawlingRequire.getId();
+                objectId = knowledge.getId();
                 return;
             }
         }

@@ -215,7 +215,7 @@ public class XmlHelper
                     line.setObject(nList.item(i).getNodeName());
                     Node format = nList.item(i).getFirstChild();
                     line.setFormat(format.getTextContent());
-                    line.stringToId();
+                    //line.stringToId();
                     wrapper.getPattern().add(line);
                 }
             }

@@ -19,11 +19,11 @@ import java.util.regex.Pattern;
 public class Knowledge
 {
     private String name;
-    private long id;
+    private int id;
     private List<String> terms;
     private List<String> formats;
 
-    public Knowledge(String name, long id)
+    public Knowledge(String name, int id)
     {
         this.name = name;
         this.id = id;
