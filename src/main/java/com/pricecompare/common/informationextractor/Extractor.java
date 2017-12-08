@@ -20,7 +20,6 @@ public class Extractor
     {
         setWrapper("wrapper/sampleWrapper.xml");
         List<LogicalLine> logicalLines = HtmlHelper.generateLogicalLine(elements, wrapper, query);
-        System.out.println("Found : " + findObject(logicalLines) + " product(s)");
     }
 
     private int findObject(List<LogicalLine> logicalLines)

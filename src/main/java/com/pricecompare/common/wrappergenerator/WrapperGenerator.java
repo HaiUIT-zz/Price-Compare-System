@@ -11,6 +11,7 @@ public class WrapperGenerator
 {
     private List<LogicalLine> logicalLines;
     private List<Knowledge> knowledges;
+    private Pattern usedPattern;
 
     public WrapperGenerator(List<CrawlingRequire> crawlingRequires)
     {
@@ -30,7 +31,7 @@ public class WrapperGenerator
         }
     }
 
-    public List<Product> generateWrapper()
+    public void findMostFreqPattern()
     {
         List<Pattern> patterns = generatePatterns();
 
@@ -54,29 +55,28 @@ public class WrapperGenerator
                 iterator = patterns.iterator();
             }
         }
+        usedPattern = mostFreqPattern;
+    }
 
+    public List<Product> generateProducts()
+    {
         List<Product> products = new ArrayList<>();
 
-        for (int i = 0; i < logicalLines.size() - mostFreqPattern.getPattern().size() + 1; i++)
+        for (int i = 0; i < logicalLines.size() - usedPattern.getPattern().size() + 1; i++)
         {
-            System.out.println(i + "...");
-            if (i == 534)
-            {
-                int z = 0;
-            }
-            if (logicalLines.get(i).getObjectId() == mostFreqPattern.getPattern().get(0))
+            if (logicalLines.get(i).getObjectId() == usedPattern.getPattern().get(0))
             {
                 int counter = 1;
-                while (counter < mostFreqPattern.getPattern().size() && logicalLines.get(i + counter).getObjectId() == mostFreqPattern.getPattern().get(counter))
+                while (counter < usedPattern.getPattern().size() && logicalLines.get(i + counter).getObjectId() == usedPattern.getPattern().get(counter))
                 {
                     counter++;
                 }
-                if (counter == mostFreqPattern.getPattern().size())
+                if (counter == usedPattern.getPattern().size())
                 {
                     Product p = new Product();
                     for (int k = i; k < i + counter; k++)
                     {
-                        switch (mostFreqPattern.getPattern().get(k - i))
+                        switch (usedPattern.getPattern().get(k - i))
                         {
                             case 1:
                                 p.setPrice(logicalLines.get(k).getLine());
@@ -108,10 +108,6 @@ public class WrapperGenerator
             }
         }
         return products;
-
-        //DOMSource dom = XmlHelper.exportToXml(getPatternLogical(mostFreqPattern));
-        //XmlHelper.saveWrapper(dom, "static/wrapper/.pathGuider", "viethongAWrapper.xml");
-        //System.out.println("File saved!");
     }
 
     public void generateLogicalLine(Elements elements, String query)

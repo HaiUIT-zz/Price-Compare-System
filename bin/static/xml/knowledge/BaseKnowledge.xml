@@ -1,0 +1,27 @@
+<KNOWLEDGE>
+    <OBJECTS>
+        <OBJECT>NAME</OBJECT>
+        <OBJECT>PRICE</OBJECT>
+    </OBJECTS>
+    <PRICE>
+        <ONTOLOGIES>
+            <TERM>đ</TERM>
+            <TERM>vnd</TERM>
+        </ONTOLOGIES>
+        <FORMATS>
+            <FORMAT>(\d+(,\d+)*)( ${term})</FORMAT>
+            <FORMAT>(\d+(,\d+)*)(${term})</FORMAT>
+        </FORMATS>
+    </PRICE>
+    <NAME>
+        <ONTOLOGIES>
+            <TERM>Tên mặt hàng :</TERM>
+            <TERM>Tên mặt hàng</TERM>
+            <TERM>Tên sản phẩm :</TERM>
+            <TERM>Tên sản phẩm</TERM>
+        </ONTOLOGIES>
+        <FORMATS>
+            <FORMAT>(${term} ).*</FORMAT>
+        </FORMATS>
+    </NAME>
+</KNOWLEDGE>

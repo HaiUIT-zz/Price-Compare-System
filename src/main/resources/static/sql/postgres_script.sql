@@ -130,12 +130,12 @@ Insert into crawling_requires values(default, 'NAM', 'Name');
 
 -- require_terms
 
-Insert into require_terms values(default, 1, 'Ä‘');
-Insert into require_terms values(default, 1, 'vnÄ‘');
+Insert into require_terms values(default, 1, 'đ');
+Insert into require_terms values(default, 1, 'vnđ');
 Insert into require_terms values(default, 1, 'vnd');
-Insert into require_terms values(default, 1, 'â‚«');
-Insert into require_terms values(default, 2, 'TĂªn máº·t hĂ ng :');
-Insert into require_terms values(default, 2, 'TĂªn sáº£n pháº©m :');
+Insert into require_terms values(default, 1, '₫');
+Insert into require_terms values(default, 2, 'Tên mặt hàng :');
+Insert into require_terms values(default, 2, 'Tên sản phẩm :');
 Insert into require_terms values(default, 2, 'query-input');
 
 -- term-format

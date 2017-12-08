@@ -54,7 +54,8 @@ public class ProductCrawlerController
 
             WrapperGenerator wrapperGenerator = new WrapperGenerator(crawlingRequires);
             wrapperGenerator.generateLogicalLine(elements, query);
-            List<Product> products = wrapperGenerator.generateWrapper();
+            wrapperGenerator.findMostFreqPattern();
+            List<Product> products = wrapperGenerator.generateProducts();
             model.addAttribute("products", products);
         }
         catch (Exception e)
