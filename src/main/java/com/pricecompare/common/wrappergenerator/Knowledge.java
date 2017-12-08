@@ -11,6 +11,7 @@ import org.apache.commons.text.StrSubstitutor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,6 +94,7 @@ public class Knowledge
         }
         return fomat;
     }
+
     //endregion
 
     //region Private Helper
