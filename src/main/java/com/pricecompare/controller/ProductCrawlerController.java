@@ -1,9 +1,8 @@
 package com.pricecompare.controller;
 
 import com.pricecompare.common.data.entities.CrawlingRequire;
-import com.pricecompare.common.data.entities.RequireFormat;
 import com.pricecompare.common.data.reopsitories.CrawlingRequireRepository;
-import com.pricecompare.entities.Product;
+import com.pricecompare.common.data.pojos.Product;
 import com.pricecompare.common.wrappergenerator.WrapperGenerator;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.File;
 import java.util.List;
-import java.util.Set;
 
 @Controller
 @RequestMapping("/product")

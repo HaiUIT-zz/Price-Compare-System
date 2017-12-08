@@ -1,12 +1,10 @@
 package com.pricecompare.common.wrappergenerator;
 import com.pricecompare.common.data.entities.CrawlingRequire;
-import com.pricecompare.entities.Product;
+import com.pricecompare.common.data.pojos.Product;
 import lombok.Getter;
 import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Getter
 public class WrapperGenerator
@@ -142,7 +140,7 @@ public class WrapperGenerator
         {
             Pattern p = patternFinder(nextIndex, logicalLineIds);
             nextIndex = p.getEndIndex();
-            if(p.getPattern().size() > 1)
+            if(p.getPattern().size() > 1 && validatePattern(p))
             {
                 patterns.add(p);
             }
@@ -199,9 +197,26 @@ public class WrapperGenerator
         return freq;
     }
 
-    private boolean validatePattern(Pattern pattern )
+    private boolean validatePattern(Pattern pattern)
     {
-        return false;
+        int counter = 0;
+        Set<Integer> uniqueId = new HashSet<>(pattern.getPattern());
+        for (int id : uniqueId)
+        {
+            if (id == 0)
+            {
+                continue;
+            }
+            for (Knowledge k : knowledges)
+            {
+                if (id == k.getId())
+                {
+                    counter++;
+                    break;
+                }
+            }
+        }
+        return counter == knowledges.size();
     }
     //endregion
 }
