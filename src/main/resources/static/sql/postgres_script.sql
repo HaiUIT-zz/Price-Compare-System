@@ -1,5 +1,6 @@
 CREATE TABLE "agents" (
   "id" serial NOT NULL,
+  "code" varchar(50) NOT NULL,
   "name" varchar(50) NOT NULL,
   "search_url" varchar(200) NOT NULL,
   CONSTRAINT agents_pk PRIMARY KEY ("id")
@@ -161,6 +162,10 @@ Insert into specific_details values(2, '16GB');
 Insert into specific_details values(2, '32GB');
 Insert into specific_details values(2, '64GB');
 Insert into specific_details values(2, '128GB');
+
+-- agents
+Insert into agents values(default, 'tgdd', 'thegioididong.com', 'https://www.thegioididong.com/tim-kiem?key=${query}');
+Insert into agents values(default, 'vienthonga', 'vienthonga.vn', 'https://vienthonga.vn/tim-kiem?q=${query}');
 
 
 

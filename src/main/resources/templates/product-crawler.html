@@ -2,7 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
 <th:block th:fragment="content">
     <div class="row">
-        <!-- SELECT2 EXAMPLE -->
         <div class="box box-default">
             <div class="box-header with-border">
                 <h3 class="box-title">Select an agent</h3>
@@ -29,6 +28,26 @@
                             <span class="input-group-btn" id="submit-search">
                                 <button type="button" class="btn btn-info btn-flat">Go!</button>
                             </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.row -->
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="optionsRadios" id="optionsRadios1" value="js" checked>
+                                    Wait pageload by checking page state (default)
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="sleep">
+                                    Wait padeload by Thread sleep
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
