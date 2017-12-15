@@ -29,13 +29,13 @@ public class Product
     private String image;
 
     @Column(name = "visit_count")
-    private long visit_count;
+    private Integer visit_count;
 
     @Column(name = "rating")
-    private double rating;
+    private Double rating;
 
     @Column(name = "agent_count")
-    private  int agent_count;
+    private  Integer agent_count;
 
     @OneToMany(cascade=CascadeType.ALL, mappedBy = "product", fetch = FetchType.EAGER)
     private Set<ProductAgent> productAgent;

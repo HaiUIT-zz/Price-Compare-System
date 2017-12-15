@@ -29,4 +29,7 @@ public class CrawlingRequire
 
     @OneToMany(mappedBy ="crawlingRequire", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<RequireTerm> requireTerms;
+
+    @OneToMany(mappedBy = "crawlingRequire" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<AgentRule> agentRules;
 }

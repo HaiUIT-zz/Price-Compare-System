@@ -1,5 +1,6 @@
 package com.pricecompare.common.wrappergenerator;
 
+import com.pricecompare.common.data.pojos.Wrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -10,16 +11,59 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * This class provide methods that recieved html
- * and return a formated list of String that remove
- * unneccessary html element
- * Currently support html doc in jsoup's format
- */
 public class HtmlHelper
 {
-    private  static HashMap<String, String> formattingTags = XmlHelper.getFormattingTags("static/xml/HtmlFormattingTags.xml");
-    private  static HashMap<String, String> ignoreTags = XmlHelper.getFormattingTags("static/xml/HtmlIgnoreTags.xml");
+    private static HashMap<String, String> formattingTags;
+    private static HashMap<String, String> ignoreTags;
+    private static HashMap<String, String> removeTags;
+
+    public static void setFormattingTags(List<String> formattingTags)
+    {
+        if (HtmlHelper.formattingTags == null)
+        {
+            HtmlHelper.formattingTags = new HashMap<>();
+        }
+        else
+        {
+            HtmlHelper.formattingTags.clear();
+        }
+        for (String tag: formattingTags)
+        {
+            HtmlHelper.formattingTags.put(tag, tag);
+        }
+    }
+
+    public static void setIgnoreTags(List<String> ignoreTags)
+    {
+        if (HtmlHelper.ignoreTags == null)
+        {
+            HtmlHelper.ignoreTags = new HashMap<>();
+        }
+        else
+        {
+            HtmlHelper.ignoreTags.clear();
+        }
+        for(String tag: ignoreTags)
+        {
+            HtmlHelper.ignoreTags.put(tag, tag);
+        }
+    }
+
+    public static void setRemoveTag(List<String> removeTags)
+    {
+        if (HtmlHelper.removeTags == null)
+        {
+            HtmlHelper.removeTags = new HashMap<>();
+        }
+        else
+        {
+            HtmlHelper.removeTags.clear();
+        }
+        for(String tag: removeTags)
+        {
+            HtmlHelper.removeTags.put(tag, tag);
+        }
+    }
 
     public static List<LogicalLine> generateLogicalLine(Elements elements, List<Knowledge> knowledges, String query)
     {
@@ -48,12 +92,13 @@ public class HtmlHelper
             if (!(temp.getObjectId() == 0 && logicalLines.size() == 0))
             {
                 logicalLines.add(temp);
+                System.out.println(temp.getLine());
             }
         }
         return logicalLines;
     }
 
-    public static List<LogicalLine> generateLogicalLine(Elements elements, Wrapper wrapper, String query)
+    public static List<LogicalLine> generateLogicalLine(Elements elements, Wrapper wrapper,List<Knowledge> knowledges, String query)
     {
         List<Element> extractedElement = getLogicalElement(elements);
         List<LogicalLine> logicalLines = new ArrayList<>();
@@ -65,20 +110,34 @@ public class HtmlHelper
                 LogicalLine temp = new LogicalLine();
                 temp.setLine(line);
 
-                for (LogicalLine pattern : wrapper.getPattern())
+                for (String key : wrapper.getPId().keySet())
                 {
-                    if(!pattern.getFormat().equals(""))
+                    if(!wrapper.getPId().get(key).equals(""))
                     {
-                        Pattern regex = Pattern.compile(pattern.getFormat());
-                        Matcher matcher = regex.matcher(line);
-                        if (matcher.find())
+                        String pattern = wrapper.getPId().get(key);
+                        Pattern regex;
+                        Matcher matcher;
+                        if (!pattern.equals("{query-only}"))
                         {
-                            temp.setObject(pattern.getObject());
-                            break;
+                            regex = Pattern.compile(pattern);
+                            matcher = regex.matcher(line);
+                            if (matcher.matches())
+                            {
+                                temp.setObject(key);
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if (StringUtils.containsIgnoreCase(temp.getLine(), query))
+                            {
+                                temp.setObject(key);
+                                break;
+                            }
                         }
                     }
                 }
-                //temp.stringToId();
+                temp.stringToId(knowledges);
                 logicalLines.add(temp);
             }
         }
@@ -91,6 +150,13 @@ public class HtmlHelper
         List<Element> hasNoChild = new ArrayList<>();
         try
         {
+            for (Element e: jsoupElements)
+            {
+                if (isRemove(e.tagName()))
+                {
+                    e.remove();
+                }
+            }
             for(Element e : jsoupElements)
             {
                 if (e.parent() != null && isFormating(e.tagName()))
@@ -98,7 +164,6 @@ public class HtmlHelper
                     e.unwrap();
                 }
             }
-
             for(Element e : jsoupElements)
             {
                 if (!isIgnore(e.tagName()) && !e.text().equals("") && (!hasChid(e) || !e.ownText().isEmpty()))
@@ -127,6 +192,11 @@ public class HtmlHelper
     private static  boolean isIgnore(String tag)
     {
         return  ignoreTags.containsValue(tag);
+    }
+
+    private static boolean isRemove(String tag)
+    {
+        return removeTags.containsValue(tag);
     }
     //endregion
 }
