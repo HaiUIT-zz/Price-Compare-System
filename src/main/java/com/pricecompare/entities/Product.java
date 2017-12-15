@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,6 +19,7 @@ public class Product
     @Id
     @SequenceGenerator(name="products_id_seq", sequenceName="products_id_seq", allocationSize=1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="products_id_seq")
+    @Column(name="id")
     private int id;
 
     @Column(name = "name")
@@ -34,4 +36,7 @@ public class Product
 
     @Column(name = "agent_count")
     private  int agent_count;
+
+    @OneToMany(cascade=CascadeType.ALL, mappedBy = "product", fetch = FetchType.EAGER)
+    private Set<ProductAgent> productAgent;
 }
