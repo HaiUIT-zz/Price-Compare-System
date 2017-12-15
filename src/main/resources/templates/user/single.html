@@ -8,6 +8,10 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <html lang="en">
 <head>
+    <!-- js -->
+    <script th:src="@{/user/js/jquery.min.js}"></script>
+    <!-- //js -->
+
 <title>Electronic Store a Ecommerce Online Shopping Category Bootstrap Responsive Website Template | Single Page :: w3layouts</title>
 <!-- for-mobile-apps -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,8 +29,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <!-- font-awesome icons -->
 	<link rel="stylesheet" th:href="@{/user/css/font-awesome.css}"/>
 	<!-- //font-awesome icons -->
-<!-- js -->
-    <script th:src="@{/user/js/jquery.min.js}"></script><!-- //js -->
+
 <!-- web fonts --> 
 <link href='//fonts.googleapis.com/css?family=Glegoo:400,700' rel='stylesheet' type='text/css'>
 <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic' rel='stylesheet' type='text/css'>
@@ -43,7 +46,14 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 		});
 	});
 </script>
-<!-- //end-smooth-scrolling --> 
+<!-- //end-smooth-scrolling -->
+    <!--<link rel="stylesheet" th:href="@{/css/morris.css}"/>-->
+    <!--<script type="text/javascript" th:src="@{/js/morris.js}"></script>-->
+    <!--<script type="text/javascript" th:src="@{/js/raphael.js}"></script>-->
+
+    <script type="text/javascript" th:src="@{https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js}"></script>
+    <script type="text/javascript" th:src="@{https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js}"></script>
+
 </head> 
 <body> 
 	<!-- header modal -->
@@ -247,8 +257,8 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     <div> <img th:src="${product.image}" data-imagezoom="true" class="img-responsive" alt=""> </div>
 				</div>
 				<!-- flexslider -->
-					<script defer th:src="@{user/js/jquery.flexslider.js}"></script>
-					<link rel="stylesheet" th:href="@{user/css/flexslider.css}" type="text/css" media="screen" />
+					<script defer th:src="@{/user/js/jquery.flexslider.js}"></script>
+					<link rel="stylesheet" th:href="@{/user/css/flexslider.css}" type="text/css" media="screen" />
 					<script>
 					// Can also be used with $(document).ready()
 					$(window).load(function() {
@@ -294,104 +304,36 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 					<ul>
 						<li class="resp-tab-item" aria-controls="tab_item-0" role="tab"><span>Agents</span></li>
 						<li class="resp-tab-item" aria-controls="tab_item-1" role="tab"><span>Compare Price</span></li>
-					</ul>		
+					</ul>
+
 					<div class="tab-1 resp-tab-content additional_info_grid" aria-labelledby="tab_item-0">
-						<h3>The Best 3GB RAM Mobile Phone</h3>
-						<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
-							eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.
-							Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut 
-							odit aut fugit, sed quia consequuntur magni dolores eos qui 
-							ratione voluptatem sequi nesciunt.Ut enim ad minima veniam, quis nostrum 
-							exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea 
-							commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate 
-							velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat 
-							quo voluptas nulla pariatur.</p>
-					</div>	
+						<h3>List of agents available: </h3>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Agent</th>
+                                    <th>Price</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <th:block th:each="productAgent, iter : ${productAgents}">
+                                    <tr>
+                                        <td th:text="${iter.index}"></td>
+                                        <td th:text="${productAgent.agent.name}"></td>
+                                        <td th:text="${productAgent.price}"></td>
+                                    </tr>
+                                </th:block>
+                                </tbody>
+                            </table>
+                        </div>
+					</div>
 
 					<div class="tab-2 resp-tab-content additional_info_grid" aria-labelledby="tab_item-1">
-						<h4>(2) Reviews</h4>
-						<div class="additional_info_sub_grids">
-							<div class="col-xs-2 additional_info_sub_grid_left">
-								<img src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/images/t1.png" alt=" " class="img-responsive" />
-							</div>
-							<div class="col-xs-10 additional_info_sub_grid_right">
-								<div class="additional_info_sub_grid_rightl">
-									<a href="single.html">Laura</a>
-									<h5>Oct 06, 2016.</h5>
-									<p>Quis autem vel eum iure reprehenderit qui in ea voluptate 
-										velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat 
-										quo voluptas nulla pariatur.</p>
-								</div>
-								<div class="additional_info_sub_grid_rightr">
-									<div class="rating">
-										<div class="rating-left">
-											<img src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/images/star-.png" alt=" " class="img-responsive">
-										</div>
-										<div class="rating-left">
-											<img src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/images/star-.png" alt=" " class="img-responsive">
-										</div>
-										<div class="rating-left">
-											<img src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/images/star-.png" alt=" " class="img-responsive">
-										</div>
-										<div class="rating-left">
-											<img src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/images/star.png" alt=" " class="img-responsive">
-										</div>
-										<div class="rating-left">
-											<img src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/images/star.png" alt=" " class="img-responsive">
-										</div>
-										<div class="clearfix"> </div>
-									</div>
-								</div>
-								<div class="clearfix"> </div>
-							</div>
-							<div class="clearfix"> </div>
-						</div>
-						<div class="additional_info_sub_grids">
-							<div class="col-xs-2 additional_info_sub_grid_left">
-								<img src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/images/t2.png" alt=" " class="img-responsive" />
-							</div>
-							<div class="col-xs-10 additional_info_sub_grid_right">
-								<div class="additional_info_sub_grid_rightl">
-									<a href="single.html">Michael</a>
-									<h5>Oct 04, 2016.</h5>
-									<p>Quis autem vel eum iure reprehenderit qui in ea voluptate 
-										velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat 
-										quo voluptas nulla pariatur.</p>
-								</div>
-								<div class="additional_info_sub_grid_rightr">
-									<div class="rating">
-										<div class="rating-left">
-											<img src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/images/star-.png" alt=" " class="img-responsive">
-										</div>
-										<div class="rating-left">
-											<img src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/images/star-.png" alt=" " class="img-responsive">
-										</div>
-										<div class="rating-left">
-											<img src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/images/star.png" alt=" " class="img-responsive">
-										</div>
-										<div class="rating-left">
-											<img src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/images/star.png" alt=" " class="img-responsive">
-										</div>
-										<div class="rating-left">
-											<img src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/images/star.png" alt=" " class="img-responsive">
-										</div>
-										<div class="clearfix"> </div>
-									</div>
-								</div>
-								<div class="clearfix"> </div>
-							</div>
-							<div class="clearfix"> </div>
-						</div>
-						<div class="review_grids">
-							<h5>Add A Review</h5>
-							<form action="#" method="post">
-								<input type="text" name="Name" value="Name" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Name';}" required="">
-								<input type="email" name="Email" placeholder="Email" required="">
-								<input type="text" name="Telephone" value="Telephone" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Telephone';}" required="">
-								<textarea name="Review" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Add Your Review';}" required="">Add Your Review</textarea>
-								<input type="submit" value="Submit" >
-							</form>
-						</div>
+						<h4>Compare Agents</h4>
+                        <!--<div id="agents-chart" style="height: 250px;"></div>-->
+                        <canvas id="myChart" style="margin: 20px"></canvas>
 					</div> 			        					            	      
 				</div>	
 			</div>
@@ -914,6 +856,81 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         	}
         });
     </script>  
-	<!-- //cart-js --> 
+	<!-- //cart-js -->
+    <th:block th:if="${agentPrices}">
+        <script th:inline="javascript">
+            var agentPrices = /*[[${agentPrices}]]*/ null;
+            console.log(agentPrices);
+            // new Morris.Bar({
+            //     element: 'agents-chart',
+            //     data: _data,
+            //     xkey: 'price',
+            //     ykeys: ['agent', 'price'],
+            //     labels: ['agent', 'price']
+            // });
+
+            var _labels = agentPrices.map(function(item) {
+                return item.agent;
+            });
+            var _data = agentPrices.map(function(item) {
+                return item.price;
+            });
+
+            function drawBarValues()
+            {
+                // render the value of the chart above the bar
+                var ctx = this.chart.ctx;
+                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, 'normal', Chart.defaults.global.defaultFontFamily);
+                ctx.fillStyle = this.chart.config.options.defaultFontColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                this.data.datasets.forEach(function (dataset) {
+                    for (var i = 0; i < dataset.data.length; i++) {
+                        if(dataset.hidden === true && dataset._meta[Object.keys(dataset._meta)[0]].hidden !== false){ continue; }
+                        var model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model;
+                        if(dataset.data[i] !== null){
+                            ctx.fillText(dataset.data[i], model.x - 1, model.y - 5);
+                        }
+                    }
+                });
+            }
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myBarChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: _labels,
+                    datasets: [{
+                        label: _labels,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgb(75, 192, 192)',
+                        data: _data,
+                    }]
+                },
+                options: {
+                    legend: {
+                        display: false
+                    },
+                    showInlineValues : true,
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero:true
+                            }
+                        }]
+                    },
+                    animation: {
+                        onProgress: drawBarValues,
+                        onComplete: drawBarValues
+                    },
+                    hover: { animationDuration: 0 }
+
+                }
+            });
+
+
+        </script>
+    </th:block>
+
 </body>
+
 </html>

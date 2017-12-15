@@ -1,6 +1,5 @@
 package com.pricecompare.entities;
 
-import com.pricecompare.common.data.entities.CrawlingRequire;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

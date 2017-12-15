@@ -1,13 +1,12 @@
 package com.pricecompare.entities;
 
-import com.pricecompare.common.data.entities.RequireFormat;
-import com.pricecompare.common.data.entities.RequireTerm;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.Set;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -22,7 +21,7 @@ public class ProductAgent
     int id;
 
     @Column(name = "price")
-    private double price;
+    private BigDecimal price;
 
     @Column(name = "url")
     private String url;

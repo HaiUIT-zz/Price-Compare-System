@@ -1,27 +1,18 @@
 package com.pricecompare.controller;
 
-import com.pricecompare.common.data.entities.CrawlingRequire;
-import com.pricecompare.common.wrappergenerator.WrapperGenerator;
-import com.pricecompare.entities.Agent;
-import com.pricecompare.entities.Product;
 import com.pricecompare.entities.ProductAgent;
 import com.pricecompare.repositories.AgentRepository;
 import com.pricecompare.repositories.ProductAgentRepository;
 import com.pricecompare.repositories.ProductRepository;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import com.pricecompare.common.data.pojos.AgentPrice;
 
-import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -39,23 +30,31 @@ public class ProductController {
 
     @RequestMapping(value = {"/mobilephones"}, method = RequestMethod.GET)
     public String mobilephones(Model model) {
-        List<ProductAgent> productAgents = this.productAgentRepository.findAll();
-        for(ProductAgent productAgent : productAgents){
-            System.out.println(productAgent.getAgent().getName());
-            System.out.println(productAgent.getProduct().getName());
-            System.out.println(productAgent.getUrl());
-            System.out.println(productAgent.getPrice());
-        }
 
-        List<Product> products = this.productRepository.findAll();
         model.addAttribute("products", this.productRepository.findAll());
+
         return "user/products";
     }
 
     @RequestMapping(value = {"/mobilephones/{productId}"}, method = RequestMethod.GET)
-    public String productDetail(Model model, @PathVariable("productId") int productId)
-    {
+    public String productDetail(Model model, @PathVariable("productId") int productId) {
+        //filter product have id
+        List<ProductAgent> productAgents = this.productAgentRepository.findAll();
+        productAgents.removeIf(element -> element.getProduct().getId() != 3);
+
+        //minimize product agent
+        List<AgentPrice> agentPrices = new ArrayList<>();
+        for(ProductAgent productAgent : productAgents){
+            AgentPrice agentPrice = new AgentPrice();
+            agentPrice.setAgent(productAgent.getAgent().getName());
+            agentPrice.setPrice(productAgent.getPrice());
+            agentPrices.add(agentPrice);
+        }
+        //set product detail to page
         model.addAttribute("product", this.productRepository.findOne(productId));
-       return "user/single";
+        model.addAttribute("productAgents", productAgents);
+        model.addAttribute("agentPrices", agentPrices);
+
+        return "user/single";
     }
 }
