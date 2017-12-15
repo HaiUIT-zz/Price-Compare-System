@@ -4,7 +4,7 @@
     <div class="row">
         <div class="box box-default">
             <div class="box-header with-border">
-                <h3 class="box-title">Select an agent</h3>
+                <h3 class="box-title">Crawler option</h3>
                 <div class="box-tools pull-right">
                     <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
                     </button>
@@ -16,8 +16,10 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <select class="form-control select2" style="width: 100%;" id="agent">
-                                <option th:value="tgdd">Thegioididong</option>
-                                <option th:value="vienthonga" selected="selected">VienthongA</option>
+                                <th:block th:each="agent : ${agents}">
+                                    <option th:value="${agent.id}" th:inline="text" th:if="${agent.id != selected_agent}">[[${agent.name}]]</option>
+                                    <option th:value="${agent.id}" th:inline="text" selected th:if="${agent.id == selected_agent}">[[${agent.name}]]</option>
+                                </th:block>
                             </select>
                         </div>
                     </div>
@@ -35,23 +37,54 @@
 
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <div class="form-group" id="wait-option">
                             <div class="radio">
                                 <label>
-                                    <input type="radio" name="optionsRadios" id="optionsRadios1" value="js" checked>
+                                    <input type="radio" name="optionsRadios" id="wait-js" value="js" checked>
                                     Wait pageload by checking page state (default)
                                 </label>
                             </div>
                             <div class="radio">
                                 <label>
-                                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="sleep">
+                                    <input type="radio" name="optionsRadios" id="thread-sleep" value="sleep">
                                     Wait padeload by Thread sleep
+                                    <input type="text" name="query" id="sleep-time" class="form-control" placeholder="time to sleep (second)" style="display:none" value="5">
                                 </label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- /.row -->
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+
+        <div class="box box-default">
+            <div class="box-header with-border">
+                <h3 class="box-title">Product duplicate checker</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="color" checked>
+                            Products having different colors are the same
+                        </label>
+                    </div>
+
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="ram">
+                            Product having different RAM are the same
+                        </label>
+                    </div>
+                </div>
             </div>
             <!-- /.box-body -->
         </div>
@@ -73,15 +106,55 @@
 
 <th:block th:fragment="script">
     <script>
-        $(function () {
+        $(document).ready(function () {
             $('.select2').select2();
+
+            if ($('#thread-sleep').is(':checked'))
+            {
+                $('#sleep-time').css('display', 'block');
+            }
+            else
+            {
+                $('#sleep-time').css('display', 'none');
+            }
 
             $('#submit-search').click(function () {
                 var agent = $('#agent').val();
-                var brand = $('#query').val();
-                window.location = '/product/crawler/' + agent + '/' + brand;
+                var query = $('#query').val();
+                var action = '/admin/product/crawl/';
+                var data = {
+                    'agent': agent,
+                    'query': query
+                };
+                if ($('#thread-sleep').is(':checked'))
+                {
+                    data.sleep = 5;
+                }
+                else
+                {
+                    data.sleep = 0;
+                }
+
+                data.color = !!$('#color').is(':checked');
+                data.ram = !!$('#ram').is(':checked');
+                console.log(data);
+                submitCrawling(action, 'post', data);
             });
-        })
+
+            $('#wait-option').change(function () {
+                var ele = $('#thread-sleep');
+                if(ele.is(':checked'))
+                {
+                    $('#sleep-time').css('display', 'block');
+                }
+                else
+                {
+                    $('#sleep-time').css('display', 'none');
+                }
+            });
+
+
+        });
     </script>
 
     <th:block th:if="${products}">
@@ -92,8 +165,8 @@
             $("#products").DataTable({
                data: data,
                 columns: [
-                    { data: 'name' , width: "50%"},
-                    { data: 'price' }
+                    { data: 'name' , width: "50%", title: 'Product name'},
+                    { data: 'price', title: 'Price' }
                 ]
             });
         </script>

@@ -1,11 +1,14 @@
 package com.pricecompare.entities;
 
+import com.pricecompare.common.data.entities.AgentLoadMore;
+import com.pricecompare.common.data.entities.AgentRule;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -16,8 +19,8 @@ import javax.persistence.*;
 public class Agent
 {
     @Id
-    @SequenceGenerator(name="products_id_seq", sequenceName="products_id_seq", allocationSize=1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="products_id_seq")
+    @SequenceGenerator(name="agents_id_seq", sequenceName="agents_id_seq", allocationSize=1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="agents_id_seq")
     private int id;
 
     @Column(name = "name")
@@ -27,5 +30,11 @@ public class Agent
     private String code;
 
     @Column(name = "search_url")
-    private long searchUrl;
+    private String searchUrl;
+
+    @OneToMany(mappedBy = "agent", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<AgentRule> agentRules;
+
+    @OneToMany(mappedBy = "agent")
+    private Set<AgentLoadMore> agentLoadMores;
 }

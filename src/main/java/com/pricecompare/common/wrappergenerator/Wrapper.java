@@ -1,8 +1,13 @@
 package com.pricecompare.common.wrappergenerator;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 public class Wrapper
 {
     private String target;
@@ -12,25 +17,5 @@ public class Wrapper
     {
         target = "";
         pattern = new ArrayList<>();
-    }
-
-    public String getTarget()
-    {
-        return target;
-    }
-
-    public void setTarget(String target)
-    {
-        this.target = target;
-    }
-
-    public List<LogicalLine> getPattern()
-    {
-        return pattern;
-    }
-
-    public void setPattern(List<LogicalLine> pattern)
-    {
-        this.pattern = pattern;
     }
 }

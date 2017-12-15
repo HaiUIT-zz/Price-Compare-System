@@ -8,6 +8,38 @@ CREATE TABLE "agents" (
 OIDS=FALSE
 );
 
+CREATE TABLE "input_styles" (
+  "attribute_id" bigint NOT NULL,
+  "value_id" bigint NOT NULL,
+  CONSTRAINT input_styles_pk PRIMARY KEY ("attribute_id", "value_id")
+) WITH (
+OIDS=FALSE
+);
+
+
+CREATE TABLE "attributes" (
+  "id" serial NOT NULL,
+  "attribute" varchar(50) NOT NULL,
+  CONSTRAINT attributes_pk PRIMARY KEY ("id")
+) WITH (
+OIDS = FALSE
+);
+
+CREATE TABLE "values" (
+  "id" serial NOT NULL,
+  "value" varchar(50) NOT NULL,
+  CONSTRAINT values_pk PRIMARY KEY ("id")
+) WITH (
+OIDS = FALSE
+);
+
+CREATE TABLE "placeholders" (
+  "id" serial NOT NULL,
+  "value" varchar(50) NOT NULL,
+  CONSTRAINT placeholders_pk PRIMARY KEY ("id")
+) WITH (
+OIDS = FALSE
+);
 
 
 CREATE TABLE "products" (
@@ -25,15 +57,37 @@ OIDS=FALSE
 
 CREATE TABLE "products_agents" (
   "product_id" bigint NOT NULL,
-  "argent_id" bigint NOT NULL,
+  "agent_id" bigint NOT NULL,
   "price" DECIMAL NOT NULL,
   "url" varchar NOT NULL,
-  CONSTRAINT products_agents_pk PRIMARY KEY ("product_id","argent_id")
+  CONSTRAINT products_agents_pk PRIMARY KEY ("product_id","agent_id")
 ) WITH (
 OIDS=FALSE
 );
 
+CREATE TABLE "ignored_tags" (
+  "id" serial NOT NULL,
+  "tag" varchar(50) NOT NULL,
+  CONSTRAINT ignored_tags_pk PRIMARY KEY ("id")
+) WITH (
+OIDS=FALSE
+);
 
+CREATE TABLE "removed_tags" (
+  "id" serial NOT NULL,
+  "tag" varchar(50) NOT NULL,
+  CONSTRAINT removed_tags_pk PRIMARY KEY ("id")
+) WITH (
+OIDS=FALSE
+);
+
+CREATE TABLE "format_tags" (
+  "id" serial NOT NULL,
+  "tag" varchar(50) NOT NULL,
+  CONSTRAINT format_tags_pk PRIMARY KEY ("id")
+) WITH (
+OIDS=FALSE
+);
 
 CREATE TABLE "ignored_words" (
   "id" serial NOT NULL,
@@ -95,22 +149,30 @@ CREATE TABLE "require_formats" (
 OIDS=FALSE
 );
 
-
-
-CREATE TABLE "argent_rules" (
-  "id" serial NOT NULL,
-  "argent_id" bigint NOT NULL,
+CREATE TABLE "agent_rules" (
+  "agent_id" bigint NOT NULL,
   "require_id" bigint NOT NULL,
   "format" varchar NOT NULL,
   "rule_index" integer NOT NULL,
-  CONSTRAINT argent_rules_pk PRIMARY KEY ("id")
+  CONSTRAINT agent_rules_pk PRIMARY KEY ("agent_id", "require_id")
+) WITH (
+OIDS=FALSE
+);
+
+CREATE TABLE "agent_loadmore_methods" (
+  "id" serial NOT NULL,
+  "agent_id" bigint NOT NULL,
+  "method" varchar(50) NOT NULL,
+  "value" varchar(100),
+  "xpath" varchar(100),
+  CONSTRAINT agent_loadmore_methods_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS=FALSE
 );
 
 
 ALTER TABLE "products_agents" ADD CONSTRAINT "products_agents_fk0" FOREIGN KEY ("product_id") REFERENCES "products"("id");
-ALTER TABLE "products_agents" ADD CONSTRAINT "products_agents_fk1" FOREIGN KEY ("argent_id") REFERENCES "agents"("id");
+ALTER TABLE "products_agents" ADD CONSTRAINT "products_agents_fk1" FOREIGN KEY ("agent_id") REFERENCES "agents"("id");
 
 
 
@@ -121,8 +183,13 @@ ALTER TABLE "require_terms" ADD CONSTRAINT "require_terms_fk0" FOREIGN KEY ("req
 
 ALTER TABLE "require_formats" ADD CONSTRAINT "require_formats_fk0" FOREIGN KEY ("require_id") REFERENCES "crawling_requires"("id");
 
-ALTER TABLE "argent_rules" ADD CONSTRAINT "argent_rules_fk0" FOREIGN KEY ("argent_id") REFERENCES "agents"("id");
-ALTER TABLE "argent_rules" ADD CONSTRAINT "argent_rules_fk1" FOREIGN KEY ("require_id") REFERENCES "crawling_requires"("id");
+ALTER TABLE "agent_rules" ADD CONSTRAINT "agent_rules_fk0" FOREIGN KEY ("agent_id") REFERENCES "agents"("id");
+ALTER TABLE "agent_rules" ADD CONSTRAINT "agent_rules_fk1" FOREIGN KEY ("require_id") REFERENCES "crawling_requires"("id");
+
+ALTER TABLE "input_styles" ADD CONSTRAINT "input_styles_fk0" FOREIGN KEY ("attribute_id") REFERENCES "attributes"("id");
+ALTER TABLE "input_styles" ADD CONSTRAINT "input_styles_fk1" FOREIGN KEY ("value_id") REFERENCES "values"("id");
+
+ALTER TABLE "agent_loadmore_methods" ADD CONSTRAINT "agent_loadmore_methods_pk0" FOREIGN KEY ("agent_id") REFERENCES "agents"("id");
 
 -- crawling_required
 
@@ -166,8 +233,83 @@ Insert into specific_details values(2, '128GB');
 -- agents
 Insert into agents values(default, 'tgdd', 'thegioididong.com', 'https://www.thegioididong.com/tim-kiem?key=${query}');
 Insert into agents values(default, 'vienthonga', 'vienthonga.vn', 'https://vienthonga.vn/tim-kiem?q=${query}');
+Insert into agents values(default, 'fptshop', 'fptshop.com.vn', 'https://fptshop.com.vn/tim-kiem/${query}');
 
+-- attributes
+Insert into "attributes" values(default, 'id');
+Insert into "attributes" values(default, 'class');
 
+-- values
+Insert into "values" values(default, 'search-keyword');
+Insert into "values" values(default, 'searchvta');
+Insert into "values" values(default, 'fs-stxt');
+
+-- input_styles
+Insert into input_styles values(1, 1);
+Insert into input_styles values(1, 2);
+Insert into input_styles values(1, 3);
+Insert into input_styles values(2, 1);
+Insert into input_styles values(2, 2);
+Insert into input_styles values(2, 3);
+
+-- placeholders
+Insert into placeholders values(default, 'tìm');
+
+-- ignored_words
+Insert into ignored_words values(default, 'cũ');
+Insert into ignored_words values(default, 'mới');
+Insert into ignored_words values(default, '100%');
+Insert into ignored_words values(default, 'chính hãng');
+Insert into ignored_words values(default, 'Hàn Quốc');
+
+-- agent_rules
+Insert into agent_rules values(1, 1, '${value}₫', 1);
+Insert into agent_rules values(1, 2, '${value}', 0);
+Insert into agent_rules values(2, 1, '${value}đ', 1);
+Insert into agent_rules values(2, 2, '${value}', 0);
+Insert into agent_rules values(3, 1, '${value} ₫', 1);
+Insert into agent_rules values(3, 2, '${value}', 0);
+
+-- agent_loadmore_methods
+Insert into agent_loadmore_methods values(default, 1, 'ajax', 'ShowMoreProductResult()', '//a[@href="javascript:ShowMoreProductResult();"]');
+Insert into agent_loadmore_methods values(default, 2, 'ajax', null, '//div[@id="SearchproductPager"]/button[@title="Xem thêm"]');
+Insert into agent_loadmore_methods values(default, 3, 'ajax', null, '//a[@data-type="san-pham"]');
+
+-- removed_tags
+Insert into removed_tags values(default, 'del');
+
+-- ignored_tags
+Insert into ignored_tags values(default, 'br');
+
+-- format_tags
+Insert into format_tags values(default, 'acronym');
+Insert into format_tags values(default, 'abbr');
+Insert into format_tags values(default, 'b');
+Insert into format_tags values(default, 'bdi');
+Insert into format_tags values(default, 'bdo');
+Insert into format_tags values(default, 'big');
+Insert into format_tags values(default, 'blockquote');
+Insert into format_tags values(default, 'center');
+Insert into format_tags values(default, 'cite');
+Insert into format_tags values(default, 'code');
+Insert into format_tags values(default, 'del');
+Insert into format_tags values(default, 'dfn');
+Insert into format_tags values(default, 'em');
+Insert into format_tags values(default, 'font');
+Insert into format_tags values(default, 'ins');
+Insert into format_tags values(default, 'kbd');
+Insert into format_tags values(default, 'mark');
+Insert into format_tags values(default, 'q');
+Insert into format_tags values(default, 'rp');
+Insert into format_tags values(default, 'rt');
+Insert into format_tags values(default, 'ruby');
+Insert into format_tags values(default, 's');
+Insert into format_tags values(default, 'samp');
+Insert into format_tags values(default, 'small');
+Insert into format_tags values(default, 'strike');
+Insert into format_tags values(default, 'sub');
+Insert into format_tags values(default, 'time');
+Insert into format_tags values(default, 'tt');
 
 --DROP SCHEMA public CASCADE;
 --CREATE SCHEMA public;

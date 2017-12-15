@@ -1,6 +1,7 @@
 package com.pricecompare.common.wrappergenerator;
 import com.pricecompare.common.data.entities.CrawlingRequire;
 import com.pricecompare.common.data.pojos.Product;
+import com.pricecompare.entities.Agent;
 import lombok.Getter;
 import org.jsoup.select.Elements;
 
@@ -58,7 +59,7 @@ public class WrapperGenerator
         usedPattern = mostFreqPattern;
     }
 
-    public List<Product> generateProducts()
+    public List<Product> generateProductsFromPattern()
     {
         List<Product> products = new ArrayList<>();
 
@@ -108,6 +109,12 @@ public class WrapperGenerator
             }
         }
         return products;
+    }
+
+    public List<Product> generateProductFromRules()
+    {
+        List<Product> products = new ArrayList<>();
+        return  products;
     }
 
     public void generateLogicalLine(Elements elements, String query)

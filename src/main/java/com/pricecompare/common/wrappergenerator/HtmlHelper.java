@@ -48,6 +48,7 @@ public class HtmlHelper
             if (!(temp.getObjectId() == 0 && logicalLines.size() == 0))
             {
                 logicalLines.add(temp);
+                System.out.println(temp.getLine());
             }
         }
         return logicalLines;
