@@ -1,7 +1,7 @@
 package com.pricecompare.common.wrappergenerator;
 import com.pricecompare.common.data.entities.CrawlingRequire;
-import com.pricecompare.common.data.pojos.Product;
-import com.pricecompare.entities.Agent;
+import com.pricecompare.common.data.pojos.ProductCrawled;
+import com.pricecompare.common.data.pojos.Wrapper;
 import lombok.Getter;
 import org.jsoup.select.Elements;
 
@@ -18,6 +18,7 @@ public class WrapperGenerator
     {
         knowledges = new ArrayList<>();
         logicalLines = new ArrayList<>();
+        usedPattern = new Pattern();
         try
         {
             for (CrawlingRequire require: crawlingRequires)
@@ -59,9 +60,14 @@ public class WrapperGenerator
         usedPattern = mostFreqPattern;
     }
 
-    public List<Product> generateProductsFromPattern()
+    public void setUsedPattern(Wrapper wrapper)
     {
-        List<Product> products = new ArrayList<>();
+        usedPattern.setPattern(wrapper.getPattern());
+    }
+
+    public List<ProductCrawled> generateProducts()
+    {
+        List<ProductCrawled> products = new ArrayList<>();
 
         for (int i = 0; i < logicalLines.size() - usedPattern.getPattern().size() + 1; i++)
         {
@@ -74,7 +80,7 @@ public class WrapperGenerator
                 }
                 if (counter == usedPattern.getPattern().size())
                 {
-                    Product p = new Product();
+                    ProductCrawled p = new ProductCrawled();
                     for (int k = i; k < i + counter; k++)
                     {
                         switch (usedPattern.getPattern().get(k - i))
@@ -83,12 +89,12 @@ public class WrapperGenerator
                                 p.setPrice(logicalLines.get(k).getLine());
                                 break;
                             case 2:
-                                p.setName(logicalLines.get(k).getLine());
+                                p.setRawName(logicalLines.get(k).getLine());
                                 break;
                         }
                     }
                     boolean containt = false;
-                    for (Product product: products)
+                    for (ProductCrawled product: products)
                     {
                         if (p.equals(product))
                         {
@@ -111,15 +117,14 @@ public class WrapperGenerator
         return products;
     }
 
-    public List<Product> generateProductFromRules()
-    {
-        List<Product> products = new ArrayList<>();
-        return  products;
-    }
-
     public void generateLogicalLine(Elements elements, String query)
     {
         logicalLines = HtmlHelper.generateLogicalLine(elements, knowledges, query);
+    }
+
+    public void  generateLogicalLine(Elements elements, String query, Wrapper wrapper)
+    {
+        logicalLines = HtmlHelper.generateLogicalLine(elements, wrapper, knowledges, query);
     }
 
 

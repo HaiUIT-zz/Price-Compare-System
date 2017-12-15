@@ -1,13 +1,15 @@
 package com.pricecompare.common.data.pojos;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 public class CrawlerOption
 {
     private int agent;
     private String query;
-    private boolean color;
-    private boolean ram;
+    private boolean ignoreColor;
+    private boolean ignoreRam;
     private int sleep = 0;
 }

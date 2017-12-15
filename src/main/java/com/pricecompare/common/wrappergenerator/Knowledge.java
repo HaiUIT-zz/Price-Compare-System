@@ -60,7 +60,7 @@ public class Knowledge
 
     public String getFormatOfLine(String line, String query)
     {
-        String fomat = "";
+        String format = "";
         String term = "";
         for (String t : terms)
         {
@@ -77,7 +77,7 @@ public class Knowledge
             {
                 if(Pattern.matches(f, line))
                 {
-                    fomat = f;
+                    format = f;
                     break;
                 }
 
@@ -88,11 +88,11 @@ public class Knowledge
             {
                 if(StringUtils.containsIgnoreCase(line, query))
                 {
-                    fomat = "{query-only}";
+                    format = "{query-only}";
                 }
             }
         }
-        return fomat;
+        return format;
     }
 
     //endregion

@@ -135,8 +135,8 @@
                     data.sleep = 0;
                 }
 
-                data.color = !!$('#color').is(':checked');
-                data.ram = !!$('#ram').is(':checked');
+                data.ignoreColor = !!$('#color').is(':checked');
+                data.ignoreRam = !!$('#ram').is(':checked');
                 console.log(data);
                 submitCrawling(action, 'post', data);
             });
@@ -165,8 +165,10 @@
             $("#products").DataTable({
                data: data,
                 columns: [
-                    { data: 'name' , width: "50%", title: 'Product name'},
-                    { data: 'price', title: 'Price' }
+                    { data: 'rawName', title: 'Product name'},
+                    { data: 'price', title: 'Price' },
+                    { data: 'possibleInDb', title: 'Product in Db'},
+                    { data: 'possibleInDbId', visible: false}
                 ]
             });
         </script>

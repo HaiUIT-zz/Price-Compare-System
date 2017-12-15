@@ -1,13 +1,8 @@
 package com.pricecompare.entities;
 
-import com.pricecompare.common.data.entities.RequireFormat;
-import com.pricecompare.common.data.entities.RequireTerm;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.Set;
 
 @Getter
 @Setter

@@ -45,9 +45,10 @@ OIDS = FALSE
 CREATE TABLE "products" (
   "id" serial NOT NULL,
   "name" varchar(100) NOT NULL,
-  "image" varchar(200) NOT NULL,
-  "visit_count" integer NOT NULL,
-  "rating" numeric(4,2) NOT NULL,
+  "image" varchar(200) ,
+  "visit_count" integer ,
+  "rating" numeric(4,2) ,
+  "agent_count" integer,
   CONSTRAINT products_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS=FALSE
@@ -110,9 +111,10 @@ OIDS=FALSE
 
 
 CREATE TABLE "specific_details" (
+  "id" serial NOT NULL,
   "specific_id" bigint NOT NULL,
   "possible_text" varchar(50) NOT NULL,
-  CONSTRAINT specific_details_pk PRIMARY KEY ("specific_id","possible_text")
+  CONSTRAINT specific_details_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS=FALSE
 );
@@ -216,19 +218,20 @@ Insert into product_specifics values(default, 'COL', 'Color');
 Insert into product_specifics values(default, 'MEM', 'Memory');
 
 -- specific_details
-Insert into specific_details values(1, 'blue');
-Insert into specific_details values(1, 'yellow');
-Insert into specific_details values(1, 'gold');
-Insert into specific_details values(1, 'silver');
-Insert into specific_details values(1, 'black');
-Insert into specific_details values(1, 'green');
-Insert into specific_details values(1, 'white');
-Insert into specific_details values(1, 'orange');
-Insert into specific_details values(2, '8GB');
-Insert into specific_details values(2, '16GB');
-Insert into specific_details values(2, '32GB');
-Insert into specific_details values(2, '64GB');
-Insert into specific_details values(2, '128GB');
+Insert into specific_details values(default, 1, 'blue');
+Insert into specific_details values(default, 1, 'yellow');
+Insert into specific_details values(default, 1, 'gold');
+Insert into specific_details values(default, 1, 'silver');
+Insert into specific_details values(default, 1, 'black');
+Insert into specific_details values(default, 1, 'green');
+Insert into specific_details values(default, 1, 'white');
+Insert into specific_details values(default, 1, 'orange');
+Insert into specific_details values(default, 2, '8GB');
+Insert into specific_details values(default, 2, '16GB');
+Insert into specific_details values(default, 2, '32GB');
+Insert into specific_details values(default, 2, '64GB');
+Insert into specific_details values(default, 2, '128GB');
+Insert into specific_details values(default, 2, '256GB');
 
 -- agents
 Insert into agents values(default, 'tgdd', 'thegioididong.com', 'https://www.thegioididong.com/tim-kiem?key=${query}');
@@ -261,14 +264,15 @@ Insert into ignored_words values(default, 'mới');
 Insert into ignored_words values(default, '100%');
 Insert into ignored_words values(default, 'chính hãng');
 Insert into ignored_words values(default, 'Hàn Quốc');
+Insert into ignored_words values(default, 'product');
 
 -- agent_rules
-Insert into agent_rules values(1, 1, '${value}₫', 1);
-Insert into agent_rules values(1, 2, '${value}', 0);
-Insert into agent_rules values(2, 1, '${value}đ', 1);
-Insert into agent_rules values(2, 2, '${value}', 0);
-Insert into agent_rules values(3, 1, '${value} ₫', 1);
-Insert into agent_rules values(3, 2, '${value}', 0);
+Insert into agent_rules values(1, 1, '(((\d+)(\.|,))+\d+)(\s*₫)', 1);
+Insert into agent_rules values(1, 2, '{query-only}', 0);
+Insert into agent_rules values(2, 1, '(((\d+)(\.|,))+\d+)(\s*đ)', 1);
+Insert into agent_rules values(2, 2, '{query-only}', 0);
+Insert into agent_rules values(3, 1, '(((\d+)(\.|,))+\d+)(\s*₫)', 1);
+Insert into agent_rules values(3, 2, '{query-only}', 0);
 
 -- agent_loadmore_methods
 Insert into agent_loadmore_methods values(default, 1, 'ajax', 'ShowMoreProductResult()', '//a[@href="javascript:ShowMoreProductResult();"]');
@@ -311,5 +315,15 @@ Insert into format_tags values(default, 'sub');
 Insert into format_tags values(default, 'time');
 Insert into format_tags values(default, 'tt');
 
+-- products
+
+Insert into products values(default, 'iPhone 5s 16GB', null, null, null, null);
+Insert into products values(default, 'iPhone 6 32GB (2017)', null, null, null, null);
+Insert into products values(default, 'iPhone 6s 64GB', null, null, null, null);
+Insert into products values(default, 'iPhone 7 128GB PRODUCT RED', null, null, null, null);
+Insert into products values(default, 'iPhone 7 Plus 128GB PRODUCT RED', null, null, null, null);
+
 --DROP SCHEMA public CASCADE;
 --CREATE SCHEMA public;
+
+select * from products where lower("name") like lower('%iphone%');

@@ -1,15 +1,19 @@
 package com.pricecompare.controller;
 
-import com.pricecompare.common.data.entities.AgentLoadMore;
-import com.pricecompare.common.data.entities.CrawlingRequire;
+import com.pricecompare.common.data.entities.*;
 import com.pricecompare.common.data.pojos.CrawlerOption;
-import com.pricecompare.common.data.reopsitories.CrawlingRequireRepository;
-import com.pricecompare.common.data.pojos.Product;
+import com.pricecompare.common.data.pojos.Wrapper;
+import com.pricecompare.common.data.reopsitories.*;
+import com.pricecompare.common.data.pojos.ProductCrawled;
+import com.pricecompare.common.wrappergenerator.HtmlHelper;
 import com.pricecompare.common.wrappergenerator.PhantomCrawler;
 import com.pricecompare.common.wrappergenerator.WrapperGenerator;
 import com.pricecompare.entities.Agent;
+import com.pricecompare.entities.Product;
 import com.pricecompare.repositories.AgentRepository;
+import com.pricecompare.repositories.ProductRepository;
 import com.pricecompare.utils.Utilities;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,12 +36,28 @@ public class ProductCrawlerController
     private static final int NO_LOAD_MORE_METHOD = 1;
     private final CrawlingRequireRepository crawlingRequireRepository;
     private final AgentRepository agentRepository;
+    private final IgnoredWordRepository ignoredWordRepository;
+    private final IgnoredTagRepository ignoredTagRepository;
+    private final RemovedTagRepository removedTagRepository;
+    private final FormatTagRepository formatTagRepository;
+    private final ProductRepository productRepository;
+    private final ProductSpecificRepository productSpecificRepository;
 
     @Autowired
-    public ProductCrawlerController(CrawlingRequireRepository crawlingRequireRepository, AgentRepository agentRepository)
+    public ProductCrawlerController(CrawlingRequireRepository crawlingRequireRepository,
+                                    AgentRepository agentRepository, IgnoredWordRepository ignoredWordRepository,
+                                    IgnoredTagRepository ignoredTagRepository, RemovedTagRepository removedTagRepository,
+                                    FormatTagRepository formatTagRepository, ProductRepository productRepository,
+                                    ProductSpecificRepository productSpecificRepository)
     {
         this.crawlingRequireRepository = crawlingRequireRepository;
         this.agentRepository = agentRepository;
+        this.ignoredWordRepository = ignoredWordRepository;
+        this.ignoredTagRepository = ignoredTagRepository;
+        this.removedTagRepository = removedTagRepository;
+        this.formatTagRepository = formatTagRepository;
+        this.productRepository = productRepository;
+        this.productSpecificRepository = productSpecificRepository;
     }
 
     @RequestMapping(value = { "/crawler"}, method = RequestMethod.GET)
@@ -72,7 +92,7 @@ public class ProductCrawlerController
             }
 
             String loadMoreMethod;
-            String xpath = "";
+            String xpath;
             String html = "";
 
             Set<AgentLoadMore> agentLoadMores = agent.getAgentLoadMores();
@@ -93,18 +113,21 @@ public class ProductCrawlerController
                         html = crawler.getSearchResultUrl(url);
                         break;
                 }
-
                 //parse HTML
                 Document document = Jsoup.parse(html);
-                document.select("del").remove();
+                HtmlHelper.setFormattingTags(formatTagRepository.findAllTag());
+                HtmlHelper.setIgnoreTags(ignoredTagRepository.findAllTag());
+                HtmlHelper.setRemoveTag(removedTagRepository.findAllTag());
 
                 //select all elements
                 Elements elements = document.select("body").select("*");
 
+                Wrapper wrapper = new Wrapper(agent);
                 WrapperGenerator wrapperGenerator = new WrapperGenerator(crawlingRequires);
-                wrapperGenerator.generateLogicalLine(elements, crawOption.getQuery());
-                wrapperGenerator.findMostFreqPattern();
-                List<Product> products = wrapperGenerator.generateProductsFromPattern();
+                wrapperGenerator.generateLogicalLine(elements, crawOption.getQuery(), wrapper);
+                wrapperGenerator.setUsedPattern(wrapper);
+                List<ProductCrawled> products = wrapperGenerator.generateProducts();
+                prodcutNameProcess(products, crawOption);
                 model.addAttribute("products", products);
             }
             else
@@ -138,5 +161,64 @@ public class ProductCrawlerController
         HashMap<String, String> map = new HashMap<>();
         map.put("query", query);
         return StrSubstitutor.replace(agent.getSearchUrl(), map);
+    }
+    
+    private void prodcutNameProcess(List<ProductCrawled> products, CrawlerOption crawlerOption)
+    {
+        String crawledName;
+        String dbName;
+        ProductSpecific productSpecific;
+        List<IgnoredWord> ignoredWords = ignoredWordRepository.findAll();
+        List<Product> productList = productRepository.findAllByBrand(crawlerOption.getQuery());
+        if (productList == null || productList.size() == 0)
+        {
+            return;
+        }
+        for (ProductCrawled product: products)
+        {
+            for (Product realProduct : productList)
+            {
+                product.setChangedName(product.getRawName());
+                dbName = realProduct.getName();
+                for (IgnoredWord word: ignoredWords)
+                {
+                    product.setChangedName(product.getChangedName().replaceAll("(?i)" + word.getWord(), ""));
+                    dbName = dbName.replaceAll("(?i)" + word.getWord(), "");
+                }
+
+                crawledName = product.getChangedName();
+
+                if (crawlerOption.isIgnoreColor())
+                {
+                    productSpecific = productSpecificRepository.findOne(1);
+                    for(SpecificDetail detail: productSpecific.getSpecificDetails())
+                    {
+                        crawledName = crawledName.replaceAll("(?i)" + detail.getPossibleText(), "");
+                        dbName = dbName.replaceAll("(?i)" + detail.getPossibleText(), "");
+                    }
+                }
+
+                if (crawlerOption.isIgnoreRam())
+                {
+                    productSpecific = productSpecificRepository.findOne(2);
+                    for(SpecificDetail detail: productSpecific.getSpecificDetails())
+                    {
+                        crawledName = crawledName.replaceAll("(?i)" + detail.getPossibleText(), "");
+                        dbName = dbName.replaceAll("(?i)" + detail.getPossibleText(), "");
+                    }
+                }
+
+                if (StringUtils.equalsIgnoreCase(crawledName, dbName))
+                {
+                    product.setPossibleInDb(realProduct.getName());
+                    product.setPossibleInDbId(realProduct.getId());
+                }
+            }
+
+            if (product.getPossibleInDb() == null || product.getPossibleInDb().equals(""))
+            {
+                product.setPossibleInDb("New product");
+            }
+        }
     }
 }
