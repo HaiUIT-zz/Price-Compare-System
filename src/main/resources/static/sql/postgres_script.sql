@@ -57,11 +57,11 @@ OIDS=FALSE
 
 
 CREATE TABLE "products_agents" (
+  "id" INTEGER NOT NULL PRIMARY KEY ,
   "product_id" bigint NOT NULL,
   "agent_id" bigint NOT NULL,
   "price" DECIMAL NOT NULL,
-  "url" varchar NOT NULL,
-  CONSTRAINT products_agents_pk PRIMARY KEY ("product_id","agent_id")
+  "url" varchar NOT NULL
 ) WITH (
 OIDS=FALSE
 );
@@ -327,3 +327,10 @@ Insert into products values(default, 'iPhone 7 Plus 128GB PRODUCT RED', null, nu
 --CREATE SCHEMA public;
 
 select * from products where lower("name") like lower('%iphone%');
+
+INSERT INTO products_agents VALUES (1, 3, 1, 13000000, 'https://www.thegioididong.com/dtdd/iphone-6s-plus-32gb');
+INSERT INTO products_agents VALUES (2, 3, 2, 12900000, 'https://vienthonga.vn/iphone-6s-plus-32gb-gold.html');
+INSERT INTO products_agents VALUES (3, 3, 3, 12300000, 'https://www.didongviet.vn/iphone-6s-plus-16gb-quoc-te-chua-active-troi-bao-hanh.html');
+INSERT INTO products_agents VALUES (4, 3, 4, 13200000, 'http://www.techone.vn/iphone-6s-plus-16gb-chi-nh-ha-ng-fpt-5572.html');
+INSERT INTO products_agents VALUES (5, 3, 5, 13500000, 'https://www.hnammobile.com/dien-thoai/apple-iphone-6s-plus-64gb-gold--certified-pre-owned-.10958.html');
+INSERT INTO products_agents VALUES (6, 9, 1, 16000000, 'https://www.thegioididong.com/dtdd/iphone-7');

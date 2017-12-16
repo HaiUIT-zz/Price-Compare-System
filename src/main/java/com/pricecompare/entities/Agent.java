@@ -1,11 +1,9 @@
 package com.pricecompare.entities;
 
-<<<<<<< HEAD
-=======
+
 import com.pricecompare.common.data.entities.AgentLoadMore;
 import com.pricecompare.common.data.entities.AgentRule;
-import com.pricecompare.common.data.entities.CrawlingRequire;
->>>>>>> 5e02cfaa60e77e9214dbc8d27e6d0465fb7db5da
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
