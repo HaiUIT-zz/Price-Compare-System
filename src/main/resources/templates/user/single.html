@@ -238,7 +238,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                 <tbody>
                                 <th:block th:each="productAgent, iter : ${productAgents}">
                                     <tr>
-                                        <td th:text="${iter.index}"></td>
+                                        <td th:text="${iter.index+1}"></td>
                                         <td th:text="${productAgent.agent.name}"></td>
                                         <td th:text="${productAgent.price}"></td>
                                     </tr>
