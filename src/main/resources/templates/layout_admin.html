@@ -28,6 +28,8 @@
     <link rel="stylesheet" th:href="@{/css/plugins/bootstrap3-wysihtml5.min.css}">
     <!-- Select2 -->
     <link rel="stylesheet" th:href="@{/css/select2.min.css}">
+    <!-- pace -->
+    <link rel="stylesheet" th:href="@{/css/pace.css}">
     <!-- Theme style -->
     <link rel="stylesheet" th:href="@{/css/AdminLTE.min.css}">
     <!-- AdminLTE Skins. Choose a skin from the css/skins
@@ -129,11 +131,11 @@
 
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa fa-exclamation-triangle"></i> <span>Argent manangement</span>
+                        <i class="fa fa-exclamation-triangle"></i> <span>Agent manangement</span>
                         <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><a th:href="@{/admin/agent/generator}"><i class="fa fa-circle-o"></i>Agent query generator</a></li>
+                        <li><a th:href="@{/admin/agent/}"><i class="fa fa-circle-o"></i>Agent query generator</a></li>
                         <li><a th:href="@{/admin/agent/crawler}"><i class="fa fa-circle-o"></i>Agent crawler</a></li>
                     </ul>
                 </li>
@@ -368,6 +370,8 @@
 </script>
 <!-- Bootstrap 3.3.7 -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<!-- pace 1.0.0 -->
+<script th:src="@{/js/pace.min.js}"></script>
 <!-- Morris.js charts -->
 <script th:src="@{/js/raphael.min.js}"></script>
 <script th:src="@{/js/morris.min.js}"></script>

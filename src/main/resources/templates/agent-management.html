@@ -1,0 +1,63 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<th:block th:fragment="content">
+    <div class="row">
+        <div class="box box-success box-solid">
+            <div class="box-header with-border">
+                <h3 class="box-title">Agent List</h3>
+                <!-- /.box-tools -->
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table id="agents">
+
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+
+    <div class="row">
+        <div class="row" style="margin-top: 10px; margin-left: 10px;">
+            <div class="col-md-1">
+                <button type="button" class="btn btn-block btn-primary"><i class="fa fa-plus-square fa-fw" aria-hidden="true"></i> Add</button>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-block btn-primary"><i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Edit</button>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-block btn-primary" onclick="checkUrl()"><i class="fa fa-check-square-o fa-fw" aria-hidden="true"></i> Check search Url</button>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="script">
+    <script th:inline="javascript">
+        var data = /*[[${agents}]]*/ null;
+        console.log(data);
+
+        $("#agents").DataTable({
+            data: data,
+            columns: [
+                { data: 'code', title: 'Code'},
+                { data: 'name', title: 'Address' },
+                { data: 'searchUrl', title: 'Search Url'},
+                { data: 'id', visible: false}
+            ]
+        });
+
+        function checkUrl()
+        {
+            $.ajax({
+                url: '/admin/agent/urlchecker/',
+                method: 'POST',
+                success: function (response) {
+                    console.log(response);
+                }
+            });
+        }
+    </script>
+</th:block>
+</html>

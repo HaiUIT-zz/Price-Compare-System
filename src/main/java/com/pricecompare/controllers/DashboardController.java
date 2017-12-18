@@ -1,4 +1,4 @@
-package com.pricecompare.controller;
+package com.pricecompare.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

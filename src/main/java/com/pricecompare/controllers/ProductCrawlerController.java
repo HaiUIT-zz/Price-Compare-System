@@ -1,10 +1,10 @@
-package com.pricecompare.controller;
+package com.pricecompare.controllers;
 
 import com.pricecompare.common.data.entities.*;
 import com.pricecompare.common.data.pojos.CrawlerOption;
 import com.pricecompare.common.data.pojos.Wrapper;
 import com.pricecompare.common.data.reopsitories.*;
-import com.pricecompare.common.data.pojos.ProductCrawled;
+import com.pricecompare.common.data.pojos.ProductDTO;
 import com.pricecompare.common.wrappergenerator.HtmlHelper;
 import com.pricecompare.common.wrappergenerator.PhantomCrawler;
 import com.pricecompare.common.wrappergenerator.WrapperGenerator;
@@ -126,7 +126,7 @@ public class ProductCrawlerController
                 WrapperGenerator wrapperGenerator = new WrapperGenerator(crawlingRequires);
                 wrapperGenerator.generateLogicalLine(elements, crawOption.getQuery(), wrapper);
                 wrapperGenerator.setUsedPattern(wrapper);
-                List<ProductCrawled> products = wrapperGenerator.generateProducts();
+                List<ProductDTO> products = wrapperGenerator.generateProducts();
                 prodcutNameProcess(products, crawOption);
                 model.addAttribute("products", products);
             }
@@ -163,7 +163,7 @@ public class ProductCrawlerController
         return StrSubstitutor.replace(agent.getSearchUrl(), map);
     }
     
-    private void prodcutNameProcess(List<ProductCrawled> products, CrawlerOption crawlerOption)
+    private void prodcutNameProcess(List<ProductDTO> products, CrawlerOption crawlerOption)
     {
         String crawledName;
         String dbName;
@@ -174,7 +174,7 @@ public class ProductCrawlerController
         {
             return;
         }
-        for (ProductCrawled product: products)
+        for (ProductDTO product: products)
         {
             for (Product realProduct : productList)
             {

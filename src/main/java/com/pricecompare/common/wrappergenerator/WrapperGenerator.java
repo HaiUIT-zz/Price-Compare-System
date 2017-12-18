@@ -1,6 +1,6 @@
 package com.pricecompare.common.wrappergenerator;
 import com.pricecompare.common.data.entities.CrawlingRequire;
-import com.pricecompare.common.data.pojos.ProductCrawled;
+import com.pricecompare.common.data.pojos.ProductDTO;
 import com.pricecompare.common.data.pojos.Wrapper;
 import lombok.Getter;
 import org.jsoup.select.Elements;
@@ -65,9 +65,9 @@ public class WrapperGenerator
         usedPattern.setPattern(wrapper.getPattern());
     }
 
-    public List<ProductCrawled> generateProducts()
+    public List<ProductDTO> generateProducts()
     {
-        List<ProductCrawled> products = new ArrayList<>();
+        List<ProductDTO> products = new ArrayList<>();
 
         for (int i = 0; i < logicalLines.size() - usedPattern.getPattern().size() + 1; i++)
         {
@@ -80,7 +80,7 @@ public class WrapperGenerator
                 }
                 if (counter == usedPattern.getPattern().size())
                 {
-                    ProductCrawled p = new ProductCrawled();
+                    ProductDTO p = new ProductDTO();
                     for (int k = i; k < i + counter; k++)
                     {
                         switch (usedPattern.getPattern().get(k - i))
@@ -94,7 +94,7 @@ public class WrapperGenerator
                         }
                     }
                     boolean containt = false;
-                    for (ProductCrawled product: products)
+                    for (ProductDTO product: products)
                     {
                         if (p.equals(product))
                         {

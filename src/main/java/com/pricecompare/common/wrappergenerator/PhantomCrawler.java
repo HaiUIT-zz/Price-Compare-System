@@ -1,6 +1,5 @@
 package com.pricecompare.common.wrappergenerator;
 
-import com.pricecompare.common.data.entities.AgentLoadMore;
 import com.pricecompare.common.data.entities.PlaceHolder;
 import com.pricecompare.common.data.pojos.InputStyle;
 import com.pricecompare.common.utils.JSWaiter;
@@ -14,8 +13,6 @@ import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-
 public class PhantomCrawler
 {
     private PhantomJSDriver driver;
@@ -23,8 +20,8 @@ public class PhantomCrawler
     private long sleepTime = 0;
     private Agent agent;
     private static final String JUNK_QUERY = "nevershowup";
-    private static final String XPATH_INPUT_STYLE = "//input[@${attribute}=\"${value}\"]";
-    private static final String XPATH_PLACEHOLDER = "//input[contains(@placeholder=\"${value}\"]";
+    private static final String XPATH_INPUT_STYLE = "//input[${attr}='${value}']";
+    private static final String XPATH_PLACEHOLDER = "//input[contains(@placeholder='${value}']";
 
     public PhantomCrawler(long sleepTime, Agent agent)
     {
@@ -71,6 +68,7 @@ public class PhantomCrawler
     {
         driver.get(homePage);
         waitPageLoad();
+        String htmlx = driver.getPageSource();
         WebElement ele = null;
 
         for (PlaceHolder placeHolder: placeHolders)
@@ -83,17 +81,16 @@ public class PhantomCrawler
         }
         if (ele == null)
         {
-            return null;
-        }
-
-        for (InputStyle inputStyle : possibleInputs)
-        {
-            ele = findBy(By.xpath(xPathInputStyle(inputStyle)));
-            if (ele != null)
+            for (InputStyle inputStyle : possibleInputs)
             {
-                break;
+                ele = findBy(By.xpath(xPathInputStyle(inputStyle)));
+                if (ele != null)
+                {
+                    break;
+                }
             }
         }
+
         if (ele == null)
         {
             return null;
