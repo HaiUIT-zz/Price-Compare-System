@@ -1,9 +1,10 @@
 package com.pricecompare.entities;
 
+
 import com.pricecompare.common.data.entities.AgentLoadMore;
 import com.pricecompare.common.data.entities.AgentRule;
-import com.pricecompare.common.data.entities.CrawlingRequire;
 import com.pricecompare.common.data.pojos.AgentDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

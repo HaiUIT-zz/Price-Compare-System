@@ -1,8 +1,13 @@
 package com.pricecompare.entities;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
+
 
 @Getter
 @Setter
@@ -10,14 +15,13 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "products_agents")
-public class ProductAgent
-{
+public class ProductAgent {
     @Id
-    @Column(name="id")
+    @Column(name = "id")
     int id;
 
     @Column(name = "price")
-    private double price;
+    private BigDecimal price;
 
     @Column(name = "url")
     private String url;
