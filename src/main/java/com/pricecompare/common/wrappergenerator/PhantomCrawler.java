@@ -4,6 +4,7 @@ import com.pricecompare.common.data.entities.PlaceHolder;
 import com.pricecompare.common.data.pojos.InputStyle;
 import com.pricecompare.common.utils.JSWaiter;
 import com.pricecompare.entities.Agent;
+import lombok.Getter;
 import org.apache.commons.text.StrSubstitutor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -19,9 +20,10 @@ public class PhantomCrawler
     private JSWaiter waiter;
     private long sleepTime = 0;
     private Agent agent;
+    @Getter
     private static final String JUNK_QUERY = "nevershowup";
-    private static final String XPATH_INPUT_STYLE = "//input[${attr}='${value}']";
-    private static final String XPATH_PLACEHOLDER = "//input[contains(@placeholder='${value}']";
+    private static final String XPATH_INPUT_STYLE = "//input[@${attr}='${value}']";
+    private static final String XPATH_PLACEHOLDER = "//input[contains(@placeholder,'${value}')]";
 
     public PhantomCrawler(long sleepTime, Agent agent)
     {
@@ -73,6 +75,7 @@ public class PhantomCrawler
 
         for (PlaceHolder placeHolder: placeHolders)
         {
+            String xpath = xPathPlaceHolder(placeHolder);
             ele = findBy(By.xpath(xPathPlaceHolder(placeHolder)));
             if (ele != null)
             {
@@ -83,6 +86,7 @@ public class PhantomCrawler
         {
             for (InputStyle inputStyle : possibleInputs)
             {
+                String inputs = xPathInputStyle(inputStyle);
                 ele = findBy(By.xpath(xPathInputStyle(inputStyle)));
                 if (ele != null)
                 {

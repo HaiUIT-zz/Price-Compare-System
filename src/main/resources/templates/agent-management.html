@@ -38,7 +38,8 @@
         var data = /*[[${agents}]]*/ null;
         console.log(data);
 
-        $("#agents").DataTable({
+         // noinspection JSJQueryEfficiency
+        var table = $("#agents").DataTable({
             data: data,
             columns: [
                 { data: 'code', title: 'Code'},
@@ -46,6 +47,21 @@
                 { data: 'searchUrl', title: 'Search Url'},
                 { data: 'id', visible: false}
             ]
+        });
+
+        // noinspection JSJQueryEfficiency
+        $("#agents").find("tbody").on( 'click', 'tr', function ()
+        {
+            console.log("hi");
+            if ( $(this).hasClass('selected') )
+            {
+                $(this).removeClass('selected');
+            }
+            else
+            {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
         });
 
         function checkUrl()

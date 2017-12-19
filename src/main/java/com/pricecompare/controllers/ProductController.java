@@ -1,4 +1,4 @@
-package com.pricecompare.controller;
+package com.pricecompare.controllers;
 
 import com.pricecompare.entities.Product;
 import com.pricecompare.entities.ProductAgent;

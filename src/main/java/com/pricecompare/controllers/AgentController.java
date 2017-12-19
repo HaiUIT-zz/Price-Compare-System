@@ -10,6 +10,7 @@ import com.pricecompare.common.wrappergenerator.PhantomCrawler;
 import com.pricecompare.entities.Agent;
 import com.pricecompare.repositories.AgentRepository;
 import com.pricecompare.utils.Utilities;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +30,7 @@ public class AgentController
     private final PlaceHolderRepository placeHolderRepository;
     private final AttributeRepository attributeRepository;
     private EntityManager em;
+    private static final String QUERY_PLACHOLDER = "${query}";
 
     @Autowired
     public AgentController(AgentRepository agentRepository, PlaceHolderRepository placeHolderRepository, 
@@ -73,8 +75,10 @@ public class AgentController
             {
                 PhantomCrawler phantom = new PhantomCrawler(agent);
                 String searchUrl = phantom.getSearchUrl(agent.getHomePage(), placeHolderRepository.findAll(), generateInputStyle());
+                searchUrl = StringUtils.replace(searchUrl, PhantomCrawler.getJUNK_QUERY(), QUERY_PLACHOLDER);
                 agent.setSearchUrl(searchUrl);
                 agentRepository.save(agent);
+                phantom.quit();
             }
             //noinspection unchecked,JpaQueryApiInspection
             agentDTOs = em.createNamedQuery("agentDTO").getResultList();

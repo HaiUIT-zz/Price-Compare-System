@@ -162,7 +162,7 @@
             var data = /*[[${products}]]*/ null;
             console.log(data);
 
-            $("#products").DataTable({
+            var table = $("#products").DataTable({
                data: data,
                 columns: [
                     { data: 'rawName', title: 'Product name'},
@@ -170,6 +170,20 @@
                     { data: 'possibleInDb', title: 'Product in Db'},
                     { data: 'possibleInDbId', visible: false}
                 ]
+            });
+
+            $("#products").find("tbody").on( 'click', 'tr', function ()
+            {
+                console.log("hi");
+                if ( $(this).hasClass('selected') )
+                {
+                    $(this).removeClass('selected');
+                }
+                else
+                {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
             });
         </script>
     </th:block>
