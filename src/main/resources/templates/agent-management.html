@@ -21,58 +21,227 @@
     <div class="row">
         <div class="row" style="margin-top: 10px; margin-left: 10px;">
             <div class="col-md-1">
-                <button type="button" class="btn btn-block btn-primary"><i class="fa fa-plus-square fa-fw" aria-hidden="true"></i> Add</button>
+                <button type="button" class="btn btn-block btn-primary" onclick="agentAction(1)"><i
+                        class="fa fa-plus-square fa-fw" aria-hidden="true"></i> Add
+                </button>
             </div>
             <div class="col-md-1">
-                <button type="button" class="btn btn-block btn-primary"><i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Edit</button>
+                <button type="button" class="btn btn-block btn-primary" onclick="agentAction(2)"><i class="fa fa-pencil-square-o fa-fw"
+                                                                           aria-hidden="true"></i> Edit
+                </button>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-block btn-danger" onclick="agentAction(3)"><i class="fa fa-trash-o fa-fw"
+                                                                                                 aria-hidden="true"></i> Delete
+                </button>
             </div>
             <div class="col-md-2">
-                <button type="button" class="btn btn-block btn-primary" onclick="checkUrl()"><i class="fa fa-check-square-o fa-fw" aria-hidden="true"></i> Check search Url</button>
+                <button id="check-search-url" type="button" class="btn btn-block btn-primary" onclick="checkUrl()"><i
+                        class="fa fa-check-square-o fa-fw" aria-hidden="true"></i> Check search Url
+                </button>
             </div>
         </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="form-modal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="form-name">Default Modal</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" id="form-agent" method="post">
+                        <fieldset>
+                            <!-- agent id -->
+                            <input id="id" name="id" type="text" hidden title="Agent id">
+                            <!-- Text input-->
+                            <div class="form-group">
+                                <label class="col-md-4 control-label" for="code">Code</label>
+                                <div class="col-md-4">
+                                    <input id="code" name="code" placeholder="Code for Agent"
+                                           class="form-control input-md" pattern=".{4,10}" title="4 to 10 characters" required type="text">
+                                </div>
+                            </div>
+                            <!-- Text input-->
+                            <div class="form-group">
+                                <label class="col-md-4 control-label" for="adress">Web adress</label>
+                                <div class="col-md-5">
+                                    <input id="adress" name="name" placeholder="format : www.example.com"
+                                           class="form-control input-md" pattern="^www\..*\..*$" title="only address contain 'www.' allowed" required type="text">
+                                </div>
+                            </div>
+                            <!-- Text input-->
+                            <div class="form-group">
+                                <label class="col-md-4 control-label" for="searchurl">Search Url (optional)</label>
+                                <div class="col-md-5">
+                                    <input id="searchurl" name="searchUrl"
+                                           placeholder="i.e : www.example.com/search/q=?${query}"
+                                           class="form-control input-md" pattern="^www\..*\..*\$\{query\}$" title="only url contain 'www.' and '${query}' allowed" type="text">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="hide" id="hidden-sumit"></button>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submit()">Save changes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
     </div>
 </th:block>
 
 <th:block th:fragment="script">
     <script th:inline="javascript">
-        var data = /*[[${agents}]]*/ null;
-        console.log(data);
+        const SUCCESS_UPDATE_URL = 'Search urls for agents were updated successful!';
+        const ERROR_UPDATE_URL = 'An error occur when try to update search url list!';
+        let formModal = $("#form-modal");
+        let formName = $("#form-name");
+        let formAgent = $("#form-agent");
+        let checkUrlBtn = $("#check-search-url");
+        let hiddenSubmit = $("#hidden-sumit");
 
-         // noinspection JSJQueryEfficiency
-        var table = $("#agents").DataTable({
-            data: data,
-            columns: [
-                { data: 'code', title: 'Code'},
-                { data: 'name', title: 'Address' },
-                { data: 'searchUrl', title: 'Search Url'},
-                { data: 'id', visible: false}
-            ]
-        });
+        let data = /*[[${agents}]]*/ null;
 
         // noinspection JSJQueryEfficiency
-        $("#agents").find("tbody").on( 'click', 'tr', function ()
-        {
-            console.log("hi");
-            if ( $(this).hasClass('selected') )
-            {
+        let table = setupTable(data);
+
+        // noinspection JSJQueryEfficiency
+        $("#agents").find("tbody").on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
                 $(this).removeClass('selected');
             }
-            else
-            {
+            else {
                 table.$('tr.selected').removeClass('selected');
                 $(this).addClass('selected');
             }
         });
 
-        function checkUrl()
-        {
-            $.ajax({
-                url: '/admin/agent/urlchecker/',
-                method: 'POST',
-                success: function (response) {
-                    console.log(response);
-                }
+        setupFormReset("#form-modal");
+
+        function checkUrl() {
+            checkUrlBtn.attr("disabled", true);
+            Pace.restart();
+            Pace.track(function () {
+                $.ajax({
+                    url: '/admin/agent/urlchecker/',
+                    method: 'POST',
+                    success: function (response) {
+                        let result = JSON.parse(response);
+                        console.log(result);
+                        if (result.success) {
+                            setupTable(result.data);
+                            successDialog(SUCCESS_UPDATE_URL);
+                        }
+                        else {
+                            errorDialog(ERROR_UPDATE_URL);
+                        }
+                        checkUrlBtn.removeAttr("disabled");
+                    },
+                    error: function () {
+                        checkUrlBtn.removeAttr("disabled");
+                        errorDialog(ERROR_UPDATE_URL);
+                    }
+                });
             });
+        }
+
+        function setupTable(data) {
+            if (!$.fn.DataTable.isDataTable("#agents")) {
+                return $("#agents").DataTable({
+                    data: data,
+                    columns: [
+                        {data: 'code', title: 'Code'},
+                        {data: 'name', title: 'Address'},
+                        {data: 'searchUrl', title: 'Search Url'},
+                        {data: 'id', visible: false}
+                    ]
+                });
+            }
+            else {
+                let table = $("#agents").DataTable();
+                table.clear();
+                table.rows.add(data);
+                table.draw();
+            }
+        }
+
+        function agentAction(opt) {
+            let selecteds;
+            let row;
+            switch (opt) {
+                case 1:
+                    formName.text("New Agent");
+                    formAgent.attr('action', '/admin/agent/add/');
+                    formModal.modal("show");
+                    break;
+                case 2:
+                    if ($.fn.DataTable.isDataTable("#agents"))
+                    {
+                        selecteds = table.rows('.selected').data();
+                        if (selecteds.length !== 1)
+                        {
+                            errorDialog(ERROR_NO_DATA_SELECTED);
+                        }
+                        else
+                        {
+                            row = selecteds[0];
+                            console.log(row);
+                            $("#id").val(row.id);
+                            $("#code").val(row.code);
+                            $("#adress").val(row.name);
+                            $("#searchurl").val(row.searchUrl);
+                            formName.text(`Edit agent : ${row.code}`);
+                            formAgent.attr('action', '/admin/agent/edit/');
+                            formModal.modal("show");
+                        }
+                    }
+                    else
+                    {
+                        errorDialog(ERROR_NO_DATA);
+                    }
+                    break;
+                case 3:
+                    if ($.fn.DataTable.isDataTable("#agents"))
+                    {
+                        selecteds = table.rows('.selected').data();
+                        if (selecteds.length !== 1)
+                        {
+                            errorDialog(ERROR_NO_DATA_SELECTED);
+                        }
+                        else
+                        {
+                            row = selecteds[0];
+                            confirmDeleted(row);
+                        }
+                    }
+                    else
+                    {
+                        errorDialog(ERROR_NO_DATA);
+                    }
+                    break;
+            }
+        }
+
+        function submit() {
+            hiddenSubmit.click();
+        }
+        
+        function confirmDeleted(row) {
+            let agent = row.name;
+            let confirm_delete = `Do you wanto delete agent : ${agent}?`;
+            confirmDeletedDialog(confirm_delete, function(){return doDelete(row.id)});
+        }
+
+        function doDelete(id) {
+            window.location = `/admin/agent/delete/${id}`;
         }
     </script>
 </th:block>

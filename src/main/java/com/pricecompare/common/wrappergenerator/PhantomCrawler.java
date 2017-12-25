@@ -70,12 +70,10 @@ public class PhantomCrawler
     {
         driver.get(homePage);
         waitPageLoad();
-        String htmlx = driver.getPageSource();
         WebElement ele = null;
 
         for (PlaceHolder placeHolder: placeHolders)
         {
-            String xpath = xPathPlaceHolder(placeHolder);
             ele = findBy(By.xpath(xPathPlaceHolder(placeHolder)));
             if (ele != null)
             {
@@ -86,7 +84,6 @@ public class PhantomCrawler
         {
             for (InputStyle inputStyle : possibleInputs)
             {
-                String inputs = xPathInputStyle(inputStyle);
                 ele = findBy(By.xpath(xPathInputStyle(inputStyle)));
                 if (ele != null)
                 {

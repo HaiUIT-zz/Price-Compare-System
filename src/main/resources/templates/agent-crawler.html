@@ -1,0 +1,108 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<th:block th:fragment="content">
+    <div class="row">
+        <div class="col-md-12 box box-default">
+            <div class="box-header with-border">
+                <h3 class="box-title">Argent crawling rule</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <select class="form-control select2" style="width: 100%;" id="agent" title="Agent">
+                            <th:block th:each="agent : ${agents}">
+                                <option th:value="${agent.id}" th:inline="text" th:if="${agent.id != selected_agent}">[[${agent.name}]]</option>
+                                <option th:value="${agent.id}" th:inline="text" selected th:if="${agent.id == selected_agent}">[[${agent.name}]]</option>
+                            </th:block>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-control select2" style="width: 100%;" id="method" title="Load more mthod">
+                                <option value="1">Ajax</option>
+                                <option value="2">Normal url</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+
+    <div class="row col-md-6" id="ajax">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h3 class="box-title">Ajax setting</h3>
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+            <form class="form-horizontal">
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="value" class="col-sm-2 control-label">Javascript function</label>
+
+                        <div class="col-sm-10">
+                            <input class="form-control" id="value" name="value" placeholder="Js function" type="text" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="xpath" class="col-sm-2 control-label">Password</label>
+
+                        <div class="col-sm-10">
+                            <input class="form-control" id="xpath" name="xpath" placeholder="xpath to clickable content" type="text" required>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-body -->
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-info pull-right">Save</button>
+                </div>
+                <!-- /.box-footer -->
+            </form>
+        </div>
+        <!-- /.box -->
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h3 class="box-title">Normal url setting</h3>
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+            <form class="form-horizontal">
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="value" class="col-sm-2 control-label">Html element</label>
+
+                        <div class="col-sm-10">
+                            <input class="form-control" id="value-url" name="value" placeholder="html elemtn contain pagingnation" type="text" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="xpath" class="col-sm-2 control-label">Password</label>
+
+                        <div class="col-sm-10">
+                            <input class="form-control" id="xpath-url" name="xpath" placeholder="xpath to pagingnation content" type="text" required>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-body -->
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-info pull-right">Save</button>
+                </div>
+                <!-- /.box-footer -->
+            </form>
+        </div>
+        <!-- /.box -->
+    </div>
+</th:block>
+
+<th:block th:fragment="script">
+    <script th:inline="javascript">
+        $('.select2').select2();
+    </script>
+</th:block>
+</html>

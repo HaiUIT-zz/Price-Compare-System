@@ -30,15 +30,16 @@ import java.util.Set;
                 @ColumnResult(name = "id", type = Integer.class),
                 @ColumnResult(name = "code", type = String.class),
                 @ColumnResult(name = "name", type = String.class),
-                @ColumnResult(name = "search_url", type = String.class)
+                @ColumnResult(name = "search_url", type = String.class),
+                @ColumnResult(name = "is_deleted", type = Boolean.class)
             }
         )
     }
 )
-@NamedNativeQuery(name = "agentDTO", query = "SELECT a.* FROM agents a", resultSetMapping="agentDTOMapping")
+@NamedNativeQuery(name = "agentDTO", query = "SELECT a.* FROM agents a WHERE a.is_deleted = FALSE", resultSetMapping="agentDTOMapping")
 public class Agent
 {
-    private static final String urlHome = "http://www.${value}";
+    private static final String urlHome = "http://${value}";
 
     @Id
     @SequenceGenerator(name="agents_id_seq", sequenceName="agents_id_seq", allocationSize=1)
@@ -54,6 +55,9 @@ public class Agent
 
     @Column(name = "search_url")
     private String searchUrl;
+
+    @Column(name = "is_deleted")
+    private  boolean isDeleted;
 
     @OneToMany(mappedBy = "agent", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<AgentRule> agentRules;

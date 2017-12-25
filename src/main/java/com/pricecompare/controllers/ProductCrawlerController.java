@@ -63,7 +63,7 @@ public class ProductCrawlerController
     @RequestMapping(value = { "/crawler"}, method = RequestMethod.GET)
     public String index(Model model)
     {
-        List<Agent> agents = agentRepository.findAll();
+        List<Agent> agents = agentRepository.findAllNotdeleted();
         if(agents != null)
         {
             model.addAttribute("agents", agents);
