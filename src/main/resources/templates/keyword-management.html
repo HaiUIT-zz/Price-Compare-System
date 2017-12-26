@@ -1,0 +1,215 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<th:block th:fragment="content">
+    <div class="row">
+        <div class="col-md-12 box box-default">
+            <div class="box-header with-border">
+                <h3 class="box-title">Keyword management</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-md-4">
+                    <h3>Ignored Format tags</h3>
+                    <table id="formats">
+
+                    </table>
+                    <form class="form-inline" id="form-format" method="post" action="/admin/keyword/formattags/add">
+                        <input name="tag" type="text" required placeholder="Insert a tag" class="form-control input-md" maxlength="50">
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i></button>
+                        <button type="button" class="btn btn-danger" data-toggle="tooltip" title="Select a row to delete" onclick="deleteData(1)"><i class="fa fa-trash-o fa-fw"
+                                                                        aria-hidden="true"></i></button>
+                    </form>
+                </div>
+
+                <div class="col-md-4">
+                    <h3>Ignored words</h3>
+                    <table id="words">
+
+                    </table>
+                    <form class="form-inline" id="form-words" method="post" action="/admin/keyword/ignoredwords/add">
+                        <input name="word" type="text" required placeholder="Insert a word" class="form-control input-md" maxlength="50">
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i></button>
+                        <button type="button" class="btn btn-danger" data-toggle="tooltip" title="Select a row to delete" onclick="deleteData(2)"><i class="fa fa-trash-o fa-fw"
+                                                                                                                              aria-hidden="true"></i></button>
+                    </form>
+                </div>
+
+                <div class="col-md-4">
+                    <h3>Ignored tags</h3>
+                    <table id="tags">
+
+                    </table>
+                    <form class="form-inline" id="form-tags" method="post" action="/admin/keyword/ignoredtags/add">
+                        <input name="tag" type="text" required placeholder="Insert a tag" class="form-control input-md" maxlength="50">
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i></button>
+                        <button type="button" class="btn btn-danger" data-toggle="tooltip" title="Select a row to delete" onclick="deleteData(3)"><i class="fa fa-trash-o fa-fw"
+                                                                                                                              aria-hidden="true"></i></button>
+                    </form>
+                </div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+</th:block>
+
+<th:block th:fragment="script">
+    <script th:inline="javascript">
+        let tags = /*[[${tags}]]*/ null;
+        let words = /*[[${words}]]*/ null;
+        let formats = /*[[${formats}]]*/ null;
+
+        let tableTag = setupTable(tags, 'tag', "#tags");
+        let tableWord = setupTable(words, 'word', "#words");
+        let tableFormat = setupTable(formats, 'tag', "#formats");
+
+        $("#formats").find("tbody").on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tableFormat.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        $("#tags").find("tbody").on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tableTag.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        $("#words").find("tbody").on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tableWord.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        function setupTable(data, valueName ,selector) {
+            if (!$.fn.DataTable.isDataTable(selector)) {
+                return $(selector).DataTable({
+                    data: data,
+                    columns: [
+                        {data: 'id', title: 'No.'},
+                        {data: valueName, title: valueName}
+                    ],
+                    searching: false,
+                    info: false
+                });
+            }
+            else {
+                let table = $(selector).DataTable();
+                table.clear();
+                table.rows.add(data);
+                table.draw();
+            }
+        }
+
+        function deleteData(option) {
+            let selecteds;
+            let row;
+            switch (option) {
+                case 1:
+                    if ($.fn.DataTable.isDataTable("#formats"))
+                    {
+                        selecteds = tableFormat.rows('.selected').data();
+                        if (selecteds.length !== 1)
+                        {
+                            errorDialog(ERROR_NO_DATA_SELECTED);
+                        }
+                        else
+                        {
+                            row = selecteds[0];
+                            confirmDeletedFormat(row);
+                        }
+                    }
+                    else
+                    {
+                        errorDialog(ERROR_NO_DATA);
+                    }
+                    break;
+                case 2:
+                    if ($.fn.DataTable.isDataTable("#words"))
+                    {
+                        selecteds = tableWord.rows('.selected').data();
+                        if (selecteds.length !== 1)
+                        {
+                            errorDialog(ERROR_NO_DATA_SELECTED);
+                        }
+                        else
+                        {
+                            row = selecteds[0];
+                            confirmDeleteWord(row);
+                        }
+                    }
+                    else
+                    {
+                        errorDialog(ERROR_NO_DATA);
+                    }
+                    break;
+                case 3:
+                    if ($.fn.DataTable.isDataTable("#tags"))
+                    {
+                        selecteds = tableTag.rows('.selected').data();
+                        if (selecteds.length !== 1)
+                        {
+                            errorDialog(ERROR_NO_DATA_SELECTED);
+                        }
+                        else
+                        {
+                            row = selecteds[0];
+                            confirmDeleteTag(row);
+                        }
+                    }
+                    else
+                    {
+                        errorDialog(ERROR_NO_DATA);
+                    }
+                    break;
+            }
+        }
+
+        function confirmDeletedFormat(row) {
+            let tag = row.tag;
+            let confirm_delete = `Do you wanto delete tag : ${tag}?`;
+            confirmDeletedDialog(confirm_delete, function(){return doDeleteFormat(row.id)});
+        }
+
+        function doDeleteFormat(id) {
+            window.location = `/admin/keyword/formattags/delete/${id}`;
+        }
+
+        function confirmDeleteWord(row) {
+            let tag = row.word;
+            let confirm_delete = `Do you wanto delete word : ${tag}?`;
+            confirmDeletedDialog(confirm_delete, function(){return doDeleteWord(row.id)});
+        }
+
+        function doDeleteWord(id) {
+            window.location = `/admin/keyword/ignoredwords/delete/${id}`;
+        }
+
+        function confirmDeleteTag(row) {
+            let tag = row.tag;
+            let confirm_delete = `Do you wanto delete tag : ${tag}?`;
+            confirmDeletedDialog(confirm_delete, function(){return doDeleteTag(row.id)});
+        }
+
+        function doDeleteTag(id) {
+            window.location = `/admin/keyword/ignoredtags/delete/${id}`;
+        }
+    </script>
+</th:block>
+</html>

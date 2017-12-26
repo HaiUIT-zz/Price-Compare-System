@@ -119,10 +119,10 @@
             }
 
             $('#submit-search').click(function () {
-                var agent = $('#agent').val();
-                var query = $('#query').val();
-                var action = '/admin/product/crawl/';
-                var data = {
+                let agent = $('#agent').val();
+                let query = $('#query').val();
+                let action = '/admin/product/crawl/';
+                let data = {
                     'agent': agent,
                     'query': query
                 };
@@ -142,7 +142,7 @@
             });
 
             $('#wait-option').change(function () {
-                var ele = $('#thread-sleep');
+                let ele = $('#thread-sleep');
                 if(ele.is(':checked'))
                 {
                     $('#sleep-time').css('display', 'block');
@@ -159,10 +159,10 @@
 
     <th:block th:if="${products}">
         <script th:inline="javascript">
-            var data = /*[[${products}]]*/ null;
+            let data = /*[[${products}]]*/ null;
             console.log(data);
 
-            $("#products").DataTable({
+            let table = $("#products").DataTable({
                data: data,
                 columns: [
                     { data: 'rawName', title: 'Product name'},
@@ -170,6 +170,20 @@
                     { data: 'possibleInDb', title: 'Product in Db'},
                     { data: 'possibleInDbId', visible: false}
                 ]
+            });
+
+            $("#products").find("tbody").on( 'click', 'tr', function ()
+            {
+                console.log("hi");
+                if ( $(this).hasClass('selected') )
+                {
+                    $(this).removeClass('selected');
+                }
+                else
+                {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
             });
         </script>
     </th:block>

@@ -1,8 +1,9 @@
 CREATE TABLE "agents" (
   "id" serial NOT NULL,
-  "code" varchar(50) NOT NULL,
+  "code" varchar(10) NOT NULL,
   "name" varchar(50) NOT NULL,
   "search_url" varchar(200) NOT NULL,
+  "is_deleted" boolean NOT NULL default false,
   CONSTRAINT agents_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS=FALSE
@@ -234,9 +235,9 @@ Insert into specific_details values(default, 2, '128GB');
 Insert into specific_details values(default, 2, '256GB');
 
 -- agents
-Insert into agents values(default, 'tgdd', 'thegioididong.com', 'https://www.thegioididong.com/tim-kiem?key=${query}');
-Insert into agents values(default, 'vienthonga', 'vienthonga.vn', 'https://vienthonga.vn/tim-kiem?q=${query}');
-Insert into agents values(default, 'fptshop', 'fptshop.com.vn', 'https://fptshop.com.vn/tim-kiem/${query}');
+Insert into agents values(default, 'tgdd', 'www.thegioididong.com', 'https://www.thegioididong.com/tim-kiem?key=bla');
+Insert into agents values(default, 'vienthonga', 'www.vienthonga.vn', 'https://vienthonga.vn/tim-kiem?q=bla');
+Insert into agents values(default, 'fptshop', 'www.fptshop.com.vn', 'https://fptshop.com.vn/tim-kiem/bla');
 
 -- attributes
 Insert into "attributes" values(default, 'id');
@@ -331,6 +332,3 @@ select * from products where lower("name") like lower('%iphone%');
 INSERT INTO products_agents VALUES (1, 3, 1, 13000000, 'https://www.thegioididong.com/dtdd/iphone-6s-plus-32gb');
 INSERT INTO products_agents VALUES (2, 3, 2, 12900000, 'https://vienthonga.vn/iphone-6s-plus-32gb-gold.html');
 INSERT INTO products_agents VALUES (3, 3, 3, 12300000, 'https://www.didongviet.vn/iphone-6s-plus-16gb-quoc-te-chua-active-troi-bao-hanh.html');
-INSERT INTO products_agents VALUES (4, 3, 4, 13200000, 'http://www.techone.vn/iphone-6s-plus-16gb-chi-nh-ha-ng-fpt-5572.html');
-INSERT INTO products_agents VALUES (5, 3, 5, 13500000, 'https://www.hnammobile.com/dien-thoai/apple-iphone-6s-plus-64gb-gold--certified-pre-owned-.10958.html');
-INSERT INTO products_agents VALUES (6, 9, 1, 16000000, 'https://www.thegioididong.com/dtdd/iphone-7');

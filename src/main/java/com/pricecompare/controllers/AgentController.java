@@ -10,14 +10,17 @@ import com.pricecompare.common.wrappergenerator.PhantomCrawler;
 import com.pricecompare.entities.Agent;
 import com.pricecompare.repositories.AgentRepository;
 import com.pricecompare.utils.Utilities;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.xpath.operations.Mod;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +32,9 @@ public class AgentController
     private final PlaceHolderRepository placeHolderRepository;
     private final AttributeRepository attributeRepository;
     private EntityManager em;
+    private static final String QUERY_PLACHOLDER = "${query}";
+    private static final String URL_REGEX = "^www\\..*\\..*$";
+    private static final String SEARCH_URL_REGEX = "^www\\..*\\..*\\$\\{query\\}$";
 
     @Autowired
     public AgentController(AgentRepository agentRepository, PlaceHolderRepository placeHolderRepository, 
@@ -56,16 +62,16 @@ public class AgentController
         {
             System.out.println(e.getMessage());
         }
-
         Utilities.setPageContent(model, "agent-management", "content", "script");
         return "layout_admin";
     }
 
     @RequestMapping(value = {"/urlchecker"}, method = RequestMethod.POST)
     @ResponseBody
-    public List<AgentDTO> urlCheck()
+    public String urlCheck()
     {
-        List<AgentDTO> agentDTOs = null;
+        List<AgentDTO> agentDTOs = new ArrayList<>();
+        boolean flag = false;
         try
         {
             List<Agent> agents = agentRepository.findAll();
@@ -73,17 +79,110 @@ public class AgentController
             {
                 PhantomCrawler phantom = new PhantomCrawler(agent);
                 String searchUrl = phantom.getSearchUrl(agent.getHomePage(), placeHolderRepository.findAll(), generateInputStyle());
+                searchUrl = StringUtils.replace(searchUrl, PhantomCrawler.getJUNK_QUERY(), QUERY_PLACHOLDER);
                 agent.setSearchUrl(searchUrl);
                 agentRepository.save(agent);
+                phantom.quit();
             }
             //noinspection unchecked,JpaQueryApiInspection
             agentDTOs = em.createNamedQuery("agentDTO").getResultList();
+            if (agentDTOs.size() > 0)
+            {
+                flag = true;
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            flag = false;
+        }
+        return Utilities.generateJSONwithFlag(agentDTOs, flag);
+    }
+
+    @RequestMapping(value = "/add", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String addAgent(@Valid AgentDTO agentDTO, BindingResult bindingResult)
+    {
+        try
+        {
+            if (!agentDTO.getCode().isEmpty() && !agentDTO.getName().isEmpty() &&
+                    Utilities.regexMatcher(agentDTO.getName(), URL_REGEX))
+            {
+                if (agentDTO.getSearchUrl().isEmpty() || Utilities.regexMatcher(agentDTO.getSearchUrl(), SEARCH_URL_REGEX))
+                {
+                    Agent agent = new Agent();
+                    agent.setCode(agentDTO.getCode());
+                    agent.setName(agentDTO.getName());
+                    agent.setSearchUrl(agentDTO.getSearchUrl());
+                    agentRepository.save(agent);
+                }
+            }
         }
         catch (Exception e)
         {
             System.out.println(e.getMessage());
         }
-        return agentDTOs;
+        return "redirect:/admin/agent/";
+    }
+
+    @RequestMapping(value = "/edit", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String editAgent(@Valid AgentDTO agentDTO, BindingResult bindingResult)
+    {
+        try
+        {
+            if (!agentDTO.getCode().isEmpty() && !agentDTO.getName().isEmpty() &&
+                    Utilities.regexMatcher(agentDTO.getName(), URL_REGEX))
+            {
+                if (agentDTO.getSearchUrl().isEmpty() || Utilities.regexMatcher(agentDTO.getSearchUrl(), SEARCH_URL_REGEX))
+                {
+                    Agent agent = agentRepository.findOne(agentDTO.getId());
+                    agent.setCode(agentDTO.getCode());
+                    agent.setName(agentDTO.getName());
+                    agent.setSearchUrl(agentDTO.getSearchUrl());
+                    agentRepository.save(agent);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+        return "redirect:/admin/agent/";
+    }
+
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
+    public String deleteAgent(@PathVariable(name = "id") int id)
+    {
+        try
+        {
+            Agent agent = agentRepository.findOne(id);
+            agent.setDeleted(true);
+            agentRepository.save(agent);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+        return "redirect:/admin/agent/";
+    }
+
+    @RequestMapping(value = {"/crawler"}, method = RequestMethod.GET)
+    public String crawlingRule(Model model)
+    {
+        try
+        {
+            List<Agent> agents = agentRepository.findAllNotdeleted();
+            if(agents != null)
+            {
+                model.addAttribute("agents", agents);
+                model.addAttribute("selected_agent", 1);
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+        Utilities.setPageContent(model, "agent-crawler", "content", "script");
+        return "layout_admin";
     }
     
     private List<InputStyle> generateInputStyle()
