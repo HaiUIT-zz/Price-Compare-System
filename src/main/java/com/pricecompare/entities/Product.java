@@ -37,6 +37,9 @@ public class Product
     @Column(name = "agent_count")
     private  Integer agent_count;
 
+    @Column(name = "rating_count")
+    private  Integer rating_count;
+
     @OneToMany(cascade=CascadeType.ALL, mappedBy = "product", fetch = FetchType.EAGER)
     private Set<ProductAgent> productAgent;
 }
