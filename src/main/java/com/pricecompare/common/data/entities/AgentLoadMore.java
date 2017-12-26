@@ -29,4 +29,7 @@ public class AgentLoadMore
 
     @Column(name = "xpath")
     private String xpath;
+
+    @Column(name = "agent_id", insertable = false, updatable = false)
+    private int agentId;
 }
