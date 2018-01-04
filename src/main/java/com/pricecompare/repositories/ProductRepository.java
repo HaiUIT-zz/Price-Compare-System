@@ -14,8 +14,12 @@ public interface ProductRepository extends JpaRepository<Product, Integer>
 {
     @Query(value = "SELECT p.* FROM products p WHERE lower(p.name) LIKE lower(concat('%',:query,'%'))", nativeQuery = true)
     List<Product> findAllByBrand(@Param("query") String query);
-
     List<Product> findAllByIdIn(Set<Integer> ids);
+
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE products SET agent_count = :agentCount WHERE id = :id", nativeQuery = true)
+    int updateAgentCount(@Param("agentCount") int agentCount, @Param("id") int id);
 
     @Transactional
     @Modifying
@@ -25,5 +29,11 @@ public interface ProductRepository extends JpaRepository<Product, Integer>
     @Transactional
     @Modifying
     @Query(value = "UPDATE products SET rating_count = :rating_count, rating = :rating  WHERE id = :id", nativeQuery = true)
-    int updateRating(@Param("id") int id, @Param("rating_count") int ratingCount, @Param("rating") int rating);
+    void updateRating(@Param("id") int id, @Param("rating_count") int ratingCount, @Param("rating") int rating);
+
+    List<Product> findByNameIsLike(String keyword);
+
+    @Transactional
+    @Query(value = "SELECT * FROM products WHERE name ILIKE :keyword", nativeQuery = true)
+    List<Product> findProduct(@Param("keyword") String keyword);
 }

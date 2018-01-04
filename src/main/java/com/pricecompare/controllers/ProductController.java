@@ -2,11 +2,11 @@ package com.pricecompare.controllers;
 
 import com.google.gson.Gson;
 import com.pricecompare.common.data.pojos.ProductPOJO;
-import com.pricecompare.entities.ManageVote;
 import com.pricecompare.entities.Product;
 import com.pricecompare.entities.ProductAgent;
+import com.pricecompare.entities.Voting;
 import com.pricecompare.repositories.AgentRepository;
-import com.pricecompare.repositories.ManageVoteRepository;
+import com.pricecompare.repositories.VotingRepository;
 import com.pricecompare.repositories.ProductAgentRepository;
 import com.pricecompare.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class ProductController {
     private final AgentRepository agentRepository;
 
     @Autowired
-    ManageVoteRepository manageVoteRepository;
+    VotingRepository manageVoteRepository;
 
     @Autowired
     public ProductController(ProductRepository productRepository, ProductAgentRepository productAgentRepository, AgentRepository agentRepository) {
@@ -39,15 +39,50 @@ public class ProductController {
         this.agentRepository = agentRepository;
     }
 
-    @RequestMapping(value = {"/mobilephones"}, method = RequestMethod.GET)
-    public String mobilephones(Model model) {
+    @RequestMapping(value = {"/mobilephones/{page}"}, method = RequestMethod.GET)
+    public String mobilephones(Model model, @PathVariable("page") int page) {
+        List<Product> products = this.productRepository.findAll();
+        int size = products.size();
+        final int productPerPage = 6;
+        int numberOfPage1 = products.size() / productPerPage;
+        if (numberOfPage1 * productPerPage < products.size()) {
+            numberOfPage1++;
+        }
+        int start = productPerPage * (page - 1);
+        int end = start + productPerPage;
+        if (end > size) {
+            end = size;
+        }
+        products = products.subList(start, end);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("products", products);
+        model.addAttribute("numberOfPage", numberOfPage1);
 
-        model.addAttribute("products", this.productRepository.findAll());
+        List<Product> _products = this.productRepository.findAll();
+        List<Product> productsTopRating = new ArrayList<>();
+        List<Product> productsTopRatingTemp = _products;
+        //process filter products have rating in top 3
+        productsTopRatingTemp.sort((Product _product, Product product2) -> {
+            if (_product.getRating() > product2.getRating())
+                return -1;
+            if (_product.getRating() < product2.getRating())
+                return 1;
+            return 0;
+        });
+        int indexLoopTopProduct = 0;
+        for (Product product1 : productsTopRatingTemp) {
+            if (indexLoopTopProduct == 5) {
+                break;
+            }
+            productsTopRating.add(product1);
+            indexLoopTopProduct++;
+        }
 
+        model.addAttribute("productsTopRating", productsTopRating);
         return "user/products";
     }
 
-    @RequestMapping(value = {"/mobilephones/{productId}"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/mobilephones/get/{productId}"}, method = RequestMethod.GET)
     public String productDetail(Model model, @PathVariable("productId") int productId) {
         //filter product have id
         List<ProductAgent> productAgents = this.productAgentRepository.findAll();
@@ -87,6 +122,16 @@ public class ProductController {
 
         //set product detail to page
         model.addAttribute("product", this.productRepository.findOne(productId));
+
+        //process voting of product
+        List<Voting> votings = this.votingRepository.findAll();
+        List<Voting> _votings = new ArrayList<>();
+        for (Voting voting : votings) {
+            if (voting.getProduct().getId() == productId) {
+                _votings.add(voting);
+            }
+        }
+        model.addAttribute("_votings", _votings);
         return "user/single";
     }
 
@@ -119,26 +164,35 @@ public class ProductController {
             ProductPOJO productPOJO = new ProductPOJO();
             productPOJO.setId(product.getId());
             productPOJO.setName(product.getName());
-            productPOJO.setUrlDetailProduct(url + "/mobilephones/" + product.getId());
+            productPOJO.setUrlDetailProduct(url + "/mobilephones/get/" + product.getId());
             productPOJOS.add(productPOJO);
         }
         return new Gson().toJson(productPOJOS);
     }
 
-    @ResponseBody
-    @RequestMapping(value = {"/vote1"}, method = RequestMethod.POST)
-    public void votes1(ServletRequest servletRequest) {
-        int star = Integer.parseInt(servletRequest.getParameter("star"));
-        int product_id = Integer.parseInt(servletRequest.getParameter("product_id"));
-        String address = servletRequest.getRemoteAddr();
-        if(this.manageVoteRepository.checkExistVoteOfIpForProduct(product_id, address)==null){
-            this.manageVoteRepository.addVote(address, product_id);
-        }
-        else{
+    @Autowired
+    VotingRepository votingRepository;
 
+    @ResponseBody
+    @RequestMapping(value = {"/processRating"}, method = RequestMethod.POST)
+    public void processRating(ServletRequest servletRequest) {
+        int star = Integer.parseInt(servletRequest.getParameter("star"));
+        System.out.println("star");
+        System.out.println(star);
+        String email = servletRequest.getParameter("email");
+
+        System.out.println("email");
+        System.out.println(email);
+        int product_id = Integer.parseInt(servletRequest.getParameter("product_id"));
+        System.out.println("product_id");
+        System.out.println(product_id);
+        System.out.println(votingRepository.checkExistVoteOfIpForProduct(product_id, email));
+        if ((votingRepository.checkExistVoteOfIpForProduct(product_id, email))!=null) {
+            this.votingRepository.updateVote(product_id, email, star);
+        } else {
+            this.votingRepository.addVote(email, product_id, star);
         }
     }
-
 
     @RequestMapping(value = {"/vote"}, method = RequestMethod.GET)
     public void votes(ServletRequest servletRequest) {
@@ -149,6 +203,20 @@ public class ProductController {
         int total_rating_count = 1 + product.getRating_count();
         int rating_result = new Double(total_rating / total_rating_count).intValue();
         this.productRepository.updateRating(id, total_rating_count, rating_result);
+    }
+
+    @RequestMapping(value = {"/mobilephones/find"}, method = RequestMethod.POST)
+    public String findProduct(Model model, ServletRequest servletRequest) {
+        String keyword = servletRequest.getParameter("Search");
+        if (keyword == null && keyword.isEmpty()) {
+            return "redirect:/mobilephones";
+        } else {
+            List<Product> products = this.productRepository.findProduct("%" + keyword + "%");
+            int numberOfPage = products.size() / 9;
+            model.addAttribute("numberOfPage", numberOfPage);
+            model.addAttribute("products", products);
+            return "user/products";
+        }
     }
 
 
