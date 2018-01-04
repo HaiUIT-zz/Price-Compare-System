@@ -1,5 +1,7 @@
 package com.pricecompare.controllers;
 
+import com.google.common.base.CharMatcher;
+import com.google.gson.Gson;
 import com.pricecompare.common.data.entities.*;
 import com.pricecompare.common.data.pojos.CrawlerOption;
 import com.pricecompare.common.data.pojos.Wrapper;
@@ -10,7 +12,9 @@ import com.pricecompare.common.wrappergenerator.PhantomCrawler;
 import com.pricecompare.common.wrappergenerator.WrapperGenerator;
 import com.pricecompare.entities.Agent;
 import com.pricecompare.entities.Product;
+import com.pricecompare.entities.ProductAgent;
 import com.pricecompare.repositories.AgentRepository;
+import com.pricecompare.repositories.ProductAgentRepository;
 import com.pricecompare.repositories.ProductRepository;
 import com.pricecompare.utils.Utilities;
 import org.apache.commons.lang3.StringUtils;
@@ -20,10 +24,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -42,13 +47,14 @@ public class ProductCrawlerController
     private final FormatTagRepository formatTagRepository;
     private final ProductRepository productRepository;
     private final ProductSpecificRepository productSpecificRepository;
+    private final ProductAgentRepository productAgentRepository;
 
     @Autowired
     public ProductCrawlerController(CrawlingRequireRepository crawlingRequireRepository,
                                     AgentRepository agentRepository, IgnoredWordRepository ignoredWordRepository,
                                     IgnoredTagRepository ignoredTagRepository, RemovedTagRepository removedTagRepository,
                                     FormatTagRepository formatTagRepository, ProductRepository productRepository,
-                                    ProductSpecificRepository productSpecificRepository)
+                                    ProductSpecificRepository productSpecificRepository, ProductAgentRepository productAgentRepository)
     {
         this.crawlingRequireRepository = crawlingRequireRepository;
         this.agentRepository = agentRepository;
@@ -58,6 +64,7 @@ public class ProductCrawlerController
         this.formatTagRepository = formatTagRepository;
         this.productRepository = productRepository;
         this.productSpecificRepository = productSpecificRepository;
+        this.productAgentRepository = productAgentRepository;
     }
 
     @RequestMapping(value = { "/crawler"}, method = RequestMethod.GET)
@@ -67,7 +74,7 @@ public class ProductCrawlerController
         if(agents != null)
         {
             model.addAttribute("agents", agents);
-            model.addAttribute("selected_agent", 1);
+            model.addAttribute("selected_agent", 2);
         }
         Utilities.setPageContent(model, "product-crawler", "content", "script");
         return "layout_admin";
@@ -156,6 +163,33 @@ public class ProductCrawlerController
         return "layout_admin";
     }
 
+    @RequestMapping(value = {"/crawler/save/{agent}"}, method = RequestMethod.POST)
+    @ResponseBody
+    @Transactional
+    public String saveProducts(@RequestBody List<ProductDTO> productDTOS, @PathVariable(name = "agent") int agentId)
+    {
+        try
+        {
+            Agent agent = agentRepository.findOne(agentId);
+            ProductDTO productDTO = productDTOS.get(0);
+            {
+                if (productDTO.getPossibleInDbId() == 0)
+                {
+                    saveNewProduct(productDTO, agent);
+                }
+                else
+                {
+                    updateOldProduct(productDTO, agent);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return new Gson().toJson("{success : true}");
+    }
+
     private String searchUrlGenerator(Agent agent, String query)
     {
         HashMap<String, String> map = new HashMap<>();
@@ -172,6 +206,11 @@ public class ProductCrawlerController
         List<Product> productList = productRepository.findAllByBrand(crawlerOption.getQuery());
         if (productList == null || productList.size() == 0)
         {
+            for ( ProductDTO product : products)
+            {
+                product.setPossibleInDb("New product");
+                product.setPossibleInDbId(0);
+            }
             return;
         }
         for (ProductDTO product: products)
@@ -215,10 +254,39 @@ public class ProductCrawlerController
                 }
             }
 
-            if (product.getPossibleInDb() == null || product.getPossibleInDb().equals(""))
+            if (product.getPossibleInDb() == null || product.getPossibleInDb().equals("") || product.getPossibleInDbId() == 0)
             {
                 product.setPossibleInDb("New product");
             }
+        }
+    }
+
+    private void saveNewProduct(ProductDTO productDTO, Agent agent)
+    {
+        Product product = new Product();
+        product.setName(productDTO.getRawName());
+        product.setAgent_count(1);
+        product.setRating(0.0D);
+        product.setRating_count(0);
+        product.setVisit_count(0);
+        productRepository.save(product);
+
+        ProductAgent productAgent = new ProductAgent();
+        productAgent.setAgent(agent);
+        productAgent.setProduct(product);
+        productAgent.setPrice(new BigDecimal(CharMatcher.digit().retainFrom(productDTO.getPrice())));
+        productAgent.setUrl(agent.getName());
+        productAgentRepository.save(productAgent);
+    }
+
+    private void updateOldProduct(ProductDTO productDTO, Agent agent)
+    {
+        List<ProductAgent> productAgents = productAgentRepository.getByProductAndAgent(productDTO.getPossibleInDbId(), agent.getId());
+        if (productAgents != null && productAgents.size() > 0)
+        {
+            ProductAgent productAgent = productAgents.get(0);
+            productAgent.setPrice(new BigDecimal(CharMatcher.digit().retainFrom(productDTO.getPrice())));
+            productAgentRepository.save(productAgent);
         }
     }
 }

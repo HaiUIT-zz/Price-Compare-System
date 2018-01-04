@@ -68,6 +68,12 @@ public class UserController {
         }
         model.addAttribute("productsTopView", productsTopView);
 
+<<<<<<< HEAD
+    void countAgentForProduct(List<Product> products, List<ProductAgent> productAgents){
+//        for(Product product : products){
+//            for(ProductAgent productAgent : )
+//        }
+=======
         //process count agents of product
         int agentCount = 0;
         for (Product product : this.productRepository.findAll()) {
@@ -103,6 +109,7 @@ public class UserController {
             rating = 0;
         }
         return "user/index";
+>>>>>>> d46d949a271b70257161d69f72647fbb85929cec
     }
 
 

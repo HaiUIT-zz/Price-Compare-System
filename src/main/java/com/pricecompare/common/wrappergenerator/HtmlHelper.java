@@ -92,7 +92,7 @@ public class HtmlHelper
             if (!(temp.getObjectId() == 0 && logicalLines.size() == 0))
             {
                 logicalLines.add(temp);
-                System.out.println(temp.getLine());
+                System.out.println(temp.getObjectId() + " : " + temp.getLine());
             }
         }
         return logicalLines;
@@ -139,6 +139,7 @@ public class HtmlHelper
                 }
                 temp.stringToId(knowledges);
                 logicalLines.add(temp);
+                System.out.println(temp.getObjectId() + " : " + temp.getLine());
             }
         }
         return logicalLines;
