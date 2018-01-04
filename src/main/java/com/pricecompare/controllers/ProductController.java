@@ -57,7 +57,6 @@ public class ProductController {
         model.addAttribute("currentPage", page);
         model.addAttribute("products", products);
         model.addAttribute("numberOfPage", numberOfPage1);
-
         List<Product> _products = this.productRepository.findAll();
         List<Product> productsTopRating = new ArrayList<>();
         List<Product> productsTopRatingTemp = _products;
@@ -77,7 +76,6 @@ public class ProductController {
             productsTopRating.add(product1);
             indexLoopTopProduct++;
         }
-
         model.addAttribute("productsTopRating", productsTopRating);
         return "user/products";
     }
@@ -100,6 +98,8 @@ public class ProductController {
                 break;
             }
         }
+
+
         productAgents.removeIf(element -> element.getProduct().getId() != productId);
 
         if (productAgents.size() != 0) {
@@ -132,6 +132,42 @@ public class ProductController {
             }
         }
         model.addAttribute("_votings", _votings);
+
+        //process count agents of product
+        int agentCount = 0;
+        for (Product product2 : this.productRepository.findAll()) {
+            for (ProductAgent productAgent : productAgentRepository.findAll()) {
+                if (product2.getId() == productAgent.getProduct().getId()) {
+                    agentCount++;
+                }
+            }
+            this.productRepository.updateAgentCount(agentCount, product2.getId());
+            agentCount = 0;
+        }
+
+        //update rating of products
+        int index = 0;
+        int total = 0;
+        double rating = 0;
+        for (Product product3 : this.productRepository.findAll()) {
+            for (Voting voting : this.votingRepository.findAll()) {
+                if (product3.getId() == voting.getProduct().getId()) {
+                    index++;
+                    total += voting.getRating();
+                }
+            }
+            rating = ((double) total / index);
+            if (((rating - 0.5)) > (int) rating) {
+                rating = (int) rating + 1;
+            } else {
+                rating = (int) rating;
+            }
+            this.productRepository.updateRating(product3.getId(), index, (int) rating);
+            index = 0;
+            total = 0;
+            rating = 0;
+        }
+
         return "user/single";
     }
 
@@ -139,7 +175,6 @@ public class ProductController {
     public String mobilephonesFilterByPrice(Model model, @RequestParam("from") int from, @RequestParam("to") int to) {
         System.out.println(from);
         System.out.println(to);
-
         //filter product have id
         List<ProductAgent> productAgents = this.productAgentRepository.findAll();
         productAgents.removeIf(item -> !(item.getPrice().compareTo(BigDecimal.valueOf(from)) >= 0 &&
@@ -187,7 +222,7 @@ public class ProductController {
         System.out.println("product_id");
         System.out.println(product_id);
         System.out.println(votingRepository.checkExistVoteOfIpForProduct(product_id, email));
-        if ((votingRepository.checkExistVoteOfIpForProduct(product_id, email))!=null) {
+        if (votingRepository.checkExistVoteOfIpForProduct(product_id, email)) {
             this.votingRepository.updateVote(product_id, email, star);
         } else {
             this.votingRepository.addVote(email, product_id, star);
@@ -218,6 +253,4 @@ public class ProductController {
             return "user/products";
         }
     }
-
-
 }

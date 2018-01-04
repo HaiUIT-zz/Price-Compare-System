@@ -77,7 +77,7 @@ public class UserController {
                 }
             }
             this.productRepository.updateAgentCount(agentCount, product.getId());
-            agentCount=0;
+            agentCount = 0;
         }
 
         //update rating of products
@@ -98,9 +98,9 @@ public class UserController {
                 rating = (int) rating;
             }
             this.productRepository.updateRating(product.getId(), index, (int) rating);
-             index = 0;
-             total = 0;
-             rating = 0;
+            index = 0;
+            total = 0;
+            rating = 0;
         }
         return "user/index";
     }

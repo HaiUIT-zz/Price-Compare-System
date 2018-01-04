@@ -241,7 +241,7 @@
                                 <th:block th:each="productAgent, iter : ${productAgents}">
                                     <tr>
                                         <td th:text="${iter.index+1}"></td>
-                                        <td th:text="${productAgent.agent.name}"></td>
+                                        <td ><a th:href="${productAgent.url}" th:text="${productAgent.agent.name}"></a></td>
                                         <td th:inline="text">[[${productAgent.price}]] VND</td>
                                     </tr>
                                 </th:block>
