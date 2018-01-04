@@ -326,8 +326,7 @@ Insert into products values(default, 'iPhone 7 Plus 128GB PRODUCT RED', null, nu
 
 --DROP SCHEMA public CASCADE;
 --CREATE SCHEMA public;
-
-select * from products where lower("name") like lower('%iphone%');
+delete from agent_loadmore_methods;
 
 INSERT INTO products_agents VALUES (1, 3, 1, 13000000, 'https://www.thegioididong.com/dtdd/iphone-6s-plus-32gb');
 INSERT INTO products_agents VALUES (2, 3, 2, 12900000, 'https://vienthonga.vn/iphone-6s-plus-32gb-gold.html');

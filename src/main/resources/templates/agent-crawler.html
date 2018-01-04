@@ -34,27 +34,29 @@
         <!-- /.box -->
     </div>
 
-    <div class="row col-md-6" id="ajax">
-        <div class="box box-info">
+    <div class="row col-md-6">
+        <div class="box box-info" id="ajax">
             <div class="box-header with-border">
                 <h3 class="box-title">Ajax setting</h3>
             </div>
             <!-- /.box-header -->
             <!-- form start -->
-            <form class="form-horizontal">
+            <form class="form-horizontal" id="rule-ajax">
+                <input id="rule-ajax-id" name="id" hidden title="">
+                <input id="agentId-ajax" name="agentId" hidden title="">
                 <div class="box-body">
                     <div class="form-group">
                         <label for="value" class="col-sm-2 control-label">Javascript function</label>
 
                         <div class="col-sm-10">
-                            <input class="form-control" id="value" name="value" placeholder="Js function" type="text" required>
+                            <input class="form-control" id="value" name="value" placeholder="Js function" type="text">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="xpath" class="col-sm-2 control-label">Password</label>
+                        <label for="path" class="col-sm-2 control-label">Xpath</label>
 
                         <div class="col-sm-10">
-                            <input class="form-control" id="xpath" name="xpath" placeholder="xpath to clickable content" type="text" required>
+                            <input class="form-control" id="path" name="path" placeholder="xpath to clickable content" type="text" required>
                         </div>
                     </div>
                 </div>
@@ -66,13 +68,15 @@
             </form>
         </div>
         <!-- /.box -->
-        <div class="box box-info">
+        <div class="box box-info" id="normal-url">
             <div class="box-header with-border">
                 <h3 class="box-title">Normal url setting</h3>
             </div>
             <!-- /.box-header -->
             <!-- form start -->
-            <form class="form-horizontal">
+            <form class="form-horizontal" id="rule-url">
+                <input id="rule-url-id" name="id" hidden title="">
+                <input id="agentId-url" name="agentId" hidden title="">
                 <div class="box-body">
                     <div class="form-group">
                         <label for="value" class="col-sm-2 control-label">Html element</label>
@@ -82,10 +86,10 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="xpath" class="col-sm-2 control-label">Password</label>
+                        <label for="path-url" class="col-sm-2 control-label">Url pattern</label>
 
                         <div class="col-sm-10">
-                            <input class="form-control" id="xpath-url" name="xpath" placeholder="xpath to pagingnation content" type="text" required>
+                            <input class="form-control" id="path-url" name="path" placeholder="i.e : /result?page=2 or /result/page/2" type="text" required>
                         </div>
                     </div>
                 </div>
@@ -102,7 +106,149 @@
 
 <th:block th:fragment="script">
     <script th:inline="javascript">
-        $('.select2').select2();
+        const UPDATE_SUCCESS = "Rule saved successful!";
+        const UPDATE_ERROR = "There is an error while try to save rule!";
+        let ajax = $("#ajax");
+        let normalUrl = $("#normal-url");
+        let agents = $("#agent");
+        let methods = $("#method");
+        let ajaxForm = $("#rule-ajax");
+        let urlForm = $("#rule-url");
+
+        $(document).ready(function(){
+            $('.select2').select2();
+            activeBox();
+
+            methods.change(function () {
+                activeBox();
+            });
+
+            ajaxForm.submit(function(e){
+                console.log("enter");
+                e.preventDefault();
+                saveRule(1);
+            });
+
+            urlForm.submit(function (e) {
+                console.log("enter");
+                e.preventDefault();
+                saveRule(2);
+            });
+
+            agents.change(function () {
+                $("#agentId-ajax").val(agents.val());
+                $("#agentId-url").val(agents.val());
+                Pace.restart();
+                Pace.track(function () {
+                    let agentId = agents.val();
+                    $.ajax({
+                        url : `/admin/agent/agentloadmore/get/${agentId}`,
+                        method : 'GET',
+                        success : function (response) {
+                            if (response.id === 0)
+                            {
+                                $("#agentId-ajax").val(0);
+                                $("#agentId-url").val(0);
+                                $("#value").val("");
+                                $("#path").val("");
+                                $("#rule-ajax-id").val(0);
+                                $("#value-url").val("");
+                                $("#path-url").val("");
+                                $("#rule-url-id").val(0);
+                            }
+                            else
+                            {
+                                switch (response.method)
+                                {
+                                    case "ajax":
+                                        methods.val(1);
+                                        $("#value").val(response.value);
+                                        $("#path").val(response.xpath);
+                                        $("#rule-ajax-id").val(response.id);
+                                        break;
+                                    case "url":
+                                        methods.val(2);
+                                        $("#value-url").val(response.value);
+                                        $("#path-url").val(response.xpath);
+                                        $("#rule-url-id").val(response.id);
+                                        break;
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+
+            function activeBox() {
+                let option = parseInt(methods.val());
+                switch (option)
+                {
+                    case 1:
+                        ajax.show();
+                        normalUrl.hide();
+                        break;
+                    case 2:
+                        ajax.hide();
+                        normalUrl.show();
+                        break;
+                }
+            }
+
+            function saveRule(option) {
+                let id = 0;
+                let agentId = agents.val();
+                let value = "";
+                let xPath = "";
+                let method = option;
+                switch (option)
+                {
+                    case 1:
+                        id = $("#rule-ajax-id").val();
+                        value = $("#value").val();
+                        xPath = $("#path").val();
+                        break;
+                    case 2:
+                        id = $("#rule-url-id").val();
+                        value = $("#value-url").val();
+                        xPath = $("#path-url").val();
+                        break;
+                }
+
+                let sender = {
+                    id: id,
+                    agentId: agentId,
+                    method: method,
+                    value: value,
+                    path: xPath
+                };
+
+                console.log(sender);
+
+                Pace.restart();
+                Pace.track(function(){
+                   $.ajax({
+                       url: "/admin/agent/agentloadmore/put",
+                       method: "POST",
+                       dataType: "json",
+                       contentType:'application/json',
+                       data: JSON.stringify(sender),
+                       success: function(response) {
+                           if (response)
+                           {
+                               successDialog(UPDATE_SUCCESS);
+                           }
+                           else
+                           {
+                               errorDialog(UPDATE_ERROR);
+                           }
+                       },
+                       error: function () {
+                           errorDialog(UPDATE_ERROR);
+                       }
+                   });
+                });
+            }
+        });
     </script>
 </th:block>
 </html>

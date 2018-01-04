@@ -1,9 +1,12 @@
 package com.pricecompare.controllers;
 
+import com.pricecompare.common.data.entities.AgentLoadMore;
 import com.pricecompare.common.data.entities.Attribute;
 import com.pricecompare.common.data.entities.Value;
 import com.pricecompare.common.data.pojos.AgentDTO;
+import com.pricecompare.common.data.pojos.AgentLoadMoreDTO;
 import com.pricecompare.common.data.pojos.InputStyle;
+import com.pricecompare.common.data.reopsitories.AgentLoadMoreRepository;
 import com.pricecompare.common.data.reopsitories.AttributeRepository;
 import com.pricecompare.common.data.reopsitories.PlaceHolderRepository;
 import com.pricecompare.common.wrappergenerator.PhantomCrawler;
@@ -11,7 +14,6 @@ import com.pricecompare.entities.Agent;
 import com.pricecompare.repositories.AgentRepository;
 import com.pricecompare.utils.Utilities;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.xpath.operations.Mod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -31,18 +33,20 @@ public class AgentController
     private final AgentRepository agentRepository;
     private final PlaceHolderRepository placeHolderRepository;
     private final AttributeRepository attributeRepository;
+    private final AgentLoadMoreRepository agentLoadMoreRepository;
     private EntityManager em;
     private static final String QUERY_PLACHOLDER = "${query}";
     private static final String URL_REGEX = "^www\\..*\\..*$";
     private static final String SEARCH_URL_REGEX = "^www\\..*\\..*\\$\\{query\\}$";
 
     @Autowired
-    public AgentController(AgentRepository agentRepository, PlaceHolderRepository placeHolderRepository, 
-                           AttributeRepository attributeRepository, EntityManager em)
+    public AgentController(AgentRepository agentRepository, PlaceHolderRepository placeHolderRepository,
+                           AttributeRepository attributeRepository, AgentLoadMoreRepository agentLoadMoreRepository, EntityManager em)
     {
         this.agentRepository = agentRepository;
         this.placeHolderRepository = placeHolderRepository;
         this.attributeRepository = attributeRepository;
+        this.agentLoadMoreRepository = agentLoadMoreRepository;
         this.em = em;
     }
 
@@ -183,6 +187,55 @@ public class AgentController
         }
         Utilities.setPageContent(model, "agent-crawler", "content", "script");
         return "layout_admin";
+    }
+
+    @RequestMapping(value = {"/agentloadmore/get/{agentId}"}, method = RequestMethod.GET)
+    @ResponseBody
+    public AgentLoadMore getAgentLoadMore(@PathVariable(name = "agentId") int agentId)
+    {
+        AgentLoadMore agentLoadMore = new AgentLoadMore();
+        try
+        {
+            List<AgentLoadMore> agentLoadMores = agentLoadMoreRepository.findByAgentId(agentId);
+            if (agentLoadMores.size() > 0)
+            {
+                agentLoadMore = agentLoadMores.get(0);
+                agentLoadMore.setAgent(null);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return agentLoadMore;
+    }
+
+    @RequestMapping(value = {"/agentloadmore/put"}, method = RequestMethod.POST)
+    @ResponseBody
+    public boolean putAgentLoadMore(@RequestBody AgentLoadMoreDTO agentLoadMoreDTO)
+    {
+        boolean result = false;
+        try
+        {
+            String method = agentLoadMoreDTO.getMethod() == 1 ? "ajax" : "url";
+            AgentLoadMore agentLoadMore = agentLoadMoreRepository.findOne(agentLoadMoreDTO.getId());
+            if (agentLoadMore == null)
+            {
+                agentLoadMore = new AgentLoadMore();
+                Agent agent = agentRepository.findOne(agentLoadMoreDTO.getAgentId());
+                agentLoadMore.setAgent(agent);
+            }
+            agentLoadMore.setMethod(method);
+            agentLoadMore.setValue(agentLoadMoreDTO.getValue());
+            agentLoadMore.setXpath(agentLoadMoreDTO.getPath());
+            agentLoadMoreRepository.save(agentLoadMore);
+            result = true;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return result;
     }
     
     private List<InputStyle> generateInputStyle()
