@@ -1,5 +1,6 @@
 const ERROR_NO_DATA = 'There is no data to update';
 const ERROR_NO_DATA_SELECTED = 'No row selected';
+const SAVE_ERROR = 'There is an problem when try to save data to database!';
 
 function submitCrawling(action, method, input) {
     'use strict';

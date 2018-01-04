@@ -98,7 +98,7 @@
 
         <div class="row" style="margin-top: 10px;">
             <div class="col-md-1 pull-right">
-                <button type="button" class="btn btn-block btn-primary"><i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save</button>
+                <button type="button" class="btn btn-block btn-primary" onclick="saveProducts()"><i class="fa fa-floppy-o fa-fw" aria-hidden="true" ></i> Save</button>
             </div>
         </div>
     </th:block>
@@ -160,12 +160,12 @@
     <th:block th:if="${products}">
         <script th:inline="javascript">
             let data = /*[[${products}]]*/ null;
+            let selectedAgent = /*[[${selected_agent}]]*/ null;
             console.log(data);
-
             let table = $("#products").DataTable({
                data: data,
                 columns: [
-                    { data: 'rawName', title: 'Product name'},
+                    { data: 'rawName', title: 'Product name', width: '33%'},
                     { data: 'price', title: 'Price' },
                     { data: 'possibleInDb', title: 'Product in Db'},
                     { data: 'possibleInDbId', visible: false}
@@ -185,6 +185,25 @@
                     $(this).addClass('selected');
                 }
             });
+
+            function  saveProducts() {
+                Pace.restart();
+                Pace.track(function () {
+                   $.ajax({
+                       url:`/admin/product/crawler/save/${selectedAgent}`,
+                       method:'POST',
+                       data: JSON.stringify(data),
+                       dataType: "json",
+                       contentType:'application/json',
+                       success: function () {
+                           window.location = '/admin/product/crawler/';
+                       },
+                       error: function () {
+                           errorDialog(SAVE_ERROR);
+                       }
+                   })
+                });
+            }
         </script>
     </th:block>
 </th:block>

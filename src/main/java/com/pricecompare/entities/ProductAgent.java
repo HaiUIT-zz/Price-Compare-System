@@ -16,7 +16,10 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "products_agents")
 public class ProductAgent {
+
     @Id
+    @SequenceGenerator(name="products_agents_id_seq", sequenceName="products_agents_id_seq", allocationSize=1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="products_agents_id_seq")
     @Column(name = "id")
     int id;
 

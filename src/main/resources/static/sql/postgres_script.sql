@@ -58,11 +58,12 @@ OIDS=FALSE
 
 
 CREATE TABLE "products_agents" (
-  "id" INTEGER NOT NULL PRIMARY KEY ,
+  "id" serial NOT NULL,
   "product_id" bigint NOT NULL,
   "agent_id" bigint NOT NULL,
   "price" DECIMAL NOT NULL,
-  "url" varchar NOT NULL
+  "url" varchar NOT NULL,
+  CONSTRAINT products_agents_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS=FALSE
 );
@@ -326,7 +327,7 @@ Insert into products values(default, 'iPhone 7 Plus 128GB PRODUCT RED', null, nu
 
 --DROP SCHEMA public CASCADE;
 --CREATE SCHEMA public;
-delete from agent_loadmore_methods;
+--delete from agent_loadmore_methods;
 
 INSERT INTO products_agents VALUES (1, 3, 1, 13000000, 'https://www.thegioididong.com/dtdd/iphone-6s-plus-32gb');
 INSERT INTO products_agents VALUES (2, 3, 2, 12900000, 'https://vienthonga.vn/iphone-6s-plus-32gb-gold.html');

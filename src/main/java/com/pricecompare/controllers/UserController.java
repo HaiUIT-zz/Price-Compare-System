@@ -64,9 +64,9 @@ public class UserController {
     }
 
     void countAgentForProduct(List<Product> products, List<ProductAgent> productAgents){
-        for(Product product : products){
-            for(ProductAgent productAgent : )
-        }
+//        for(Product product : products){
+//            for(ProductAgent productAgent : )
+//        }
     }
 
 }
