@@ -42,4 +42,7 @@ public class Product
 
     @OneToMany(cascade=CascadeType.ALL, mappedBy = "product", fetch = FetchType.EAGER)
     private Set<ProductAgent> productAgent;
+
+    @OneToMany(cascade=CascadeType.ALL, mappedBy = "product", fetch = FetchType.EAGER)
+    private Set<ProductAgent> voting;
 }

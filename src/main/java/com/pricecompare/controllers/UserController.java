@@ -2,7 +2,10 @@ package com.pricecompare.controllers;
 
 import com.pricecompare.entities.Product;
 import com.pricecompare.entities.ProductAgent;
+import com.pricecompare.entities.Voting;
+import com.pricecompare.repositories.ProductAgentRepository;
 import com.pricecompare.repositories.ProductRepository;
+import com.pricecompare.repositories.VotingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +19,10 @@ import java.util.List;
 public class UserController {
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private ProductAgentRepository productAgentRepository;
+    @Autowired
+    private VotingRepository votingRepository;
 
     @RequestMapping(value = {"/"}, method = RequestMethod.GET)
     public String index(Model model) {
@@ -60,13 +67,43 @@ public class UserController {
             indexLoopTopProduct++;
         }
         model.addAttribute("productsTopView", productsTopView);
+
+        //process count agents of product
+        int agentCount = 0;
+        for (Product product : this.productRepository.findAll()) {
+            for (ProductAgent productAgent : productAgentRepository.findAll()) {
+                if (product.getId() == productAgent.getProduct().getId()) {
+                    agentCount++;
+                }
+            }
+            this.productRepository.updateAgentCount(agentCount, product.getId());
+            agentCount=0;
+        }
+
+        //update rating of products
+        int index = 0;
+        int total = 0;
+        double rating = 0;
+        for (Product product : this.productRepository.findAll()) {
+            for (Voting voting : this.votingRepository.findAll()) {
+                if (product.getId() == voting.getProduct().getId()) {
+                    index++;
+                    total += voting.getRating();
+                }
+            }
+            rating = ((double) total / index);
+            if (((rating - 0.5)) > (int) rating) {
+                rating = (int) rating + 1;
+            } else {
+                rating = (int) rating;
+            }
+            this.productRepository.updateRating(product.getId(), index, (int) rating);
+             index = 0;
+             total = 0;
+             rating = 0;
+        }
         return "user/index";
     }
 
-    void countAgentForProduct(List<Product> products, List<ProductAgent> productAgents){
-        for(Product product : products){
-            for(ProductAgent productAgent : )
-        }
-    }
 
 }
