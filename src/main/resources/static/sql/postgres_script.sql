@@ -49,12 +49,23 @@ CREATE TABLE "products" (
   "image" varchar(200) ,
   "visit_count" integer ,
   "rating" numeric(4,2) ,
+  "rating_count" integer,
   "agent_count" integer,
+
   CONSTRAINT products_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS=FALSE
 );
 
+create TABLE "voting"
+(
+  "id" serial not null constraint voting_pkey primary key,
+  "email" varchar(1000),
+  "product_id" integer constraint voting_product_id_fkey references products,
+  "rating" integer
+) WITH (
+OIDS=FALSE
+);
 
 
 CREATE TABLE "products_agents" (
