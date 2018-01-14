@@ -275,7 +275,7 @@ public class ProductCrawlerController
         productAgent.setAgent(agent);
         productAgent.setProduct(product);
         productAgent.setPrice(new BigDecimal(CharMatcher.digit().retainFrom(productDTO.getPrice())));
-        productAgent.setUrl(agent.getName());
+        productAgent.setUrl(productUrlmaker(agent, productDTO.getRawName()));
         productAgentRepository.save(productAgent);
     }
 
@@ -288,5 +288,28 @@ public class ProductCrawlerController
             productAgent.setPrice(new BigDecimal(CharMatcher.digit().retainFrom(productDTO.getPrice())));
             productAgentRepository.save(productAgent);
         }
+        else
+        {
+            Product product = productRepository.findOne(productDTO.getPossibleInDbId());
+            product.setAgent_count(product.getAgent_count() + 1);
+            productRepository.save(product);
+            ProductAgent productAgent = new ProductAgent();
+            productAgent.setAgent(agent);
+            productAgent.setProduct(product);
+            productAgent.setPrice(new BigDecimal(CharMatcher.digit().retainFrom(productDTO.getPrice())));
+            productAgent.setUrl(productUrlmaker(agent, productDTO.getRawName()));
+            productAgentRepository.save(productAgent);
+        }
+    }
+
+    private  String productUrlmaker(Agent agent, String productName)
+    {
+        String url;
+        productName = StringUtils.normalizeSpace(productName);
+        productName = StringUtils.replaceAll(productName, " ", "+");
+        HashMap<String, String> map = new HashMap<>();
+        map.put("query", productName);
+        url = StrSubstitutor.replace(agent.getSearchUrl(), map);
+        return  url;
     }
 }
