@@ -177,13 +177,17 @@ public class ProductController {
         System.out.println(to);
         //filter product have id
         List<ProductAgent> productAgents = this.productAgentRepository.findAll();
+
         productAgents.removeIf(item -> !(item.getPrice().compareTo(BigDecimal.valueOf(from)) >= 0 &&
                 item.getPrice().compareTo(BigDecimal.valueOf(to)) <= 0));
+
 
         Set<Integer> ids = new HashSet<>();
         for (ProductAgent productAgent : productAgents) {
             ids.add(productAgent.getProduct().getId());
+
         }
+
 
         //set product detail to page
         model.addAttribute("products", this.productRepository.findAllByIdIn(ids));
@@ -253,4 +257,8 @@ public class ProductController {
             return "user/products";
         }
     }
+
+
 }
+
+

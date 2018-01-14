@@ -5,8 +5,7 @@ License: Creative Commons Attribution 3.0 Unported
 License URL: http://creativecommons.org/licenses/by/3.0/
 -->
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
 	<title>Welcome to Price Comparison</title>
 <!-- for-mobile-apps -->
@@ -884,7 +883,6 @@ License URL: http://creativecommons.org/licenses/by/3.0/
             }
         };
         $("input[name='Search']").easyAutocomplete(options);
-        console.log("ddwqdwqdqwdwqdwq");
         // init bootpag
         $('#page-selection').bootpag({
             total: totalPage,
@@ -892,9 +890,9 @@ License URL: http://creativecommons.org/licenses/by/3.0/
             maxVisible : 5
         }).on("page", function(event, /* page number here */ num){
             let url = `/mobilephones/${num}`;
+            console.log(url);
             window.location = url;
         });
-        console.log("ddwqdwqdqwdwqdwq");
     </script>
 </th:block>
 </html>
