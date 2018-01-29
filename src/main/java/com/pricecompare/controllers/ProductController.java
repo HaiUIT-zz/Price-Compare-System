@@ -111,8 +111,10 @@ public class ProductController {
                 agentPrice.setPrice(productAgent.getPrice());
                 agentPrices.add(agentPrice);
             }
+
             model.addAttribute("productAgents", productAgents);
-            model.addAttribute("agentPrices", agentPrices);
+            System.out.println(new Gson().toJson(agentPrices));
+            model.addAttribute("agentPrices", new Gson().toJson(agentPrices));
         }
 
         //add related products list
@@ -171,29 +173,6 @@ public class ProductController {
         return "user/single";
     }
 
-    @RequestMapping(value = {"/mobilephonesf"}, method = RequestMethod.GET)
-    public String mobilephonesFilterByPrice(Model model, @RequestParam("from") int from, @RequestParam("to") int to) {
-        System.out.println(from);
-        System.out.println(to);
-        //filter product have id
-        List<ProductAgent> productAgents = this.productAgentRepository.findAll();
-
-        productAgents.removeIf(item -> !(item.getPrice().compareTo(BigDecimal.valueOf(from)) >= 0 &&
-                item.getPrice().compareTo(BigDecimal.valueOf(to)) <= 0));
-
-
-        Set<Integer> ids = new HashSet<>();
-        for (ProductAgent productAgent : productAgents) {
-            ids.add(productAgent.getProduct().getId());
-
-        }
-
-
-        //set product detail to page
-        model.addAttribute("products", this.productRepository.findAllByIdIn(ids));
-        return "user/products";
-    }
-
     @ResponseBody
     @RequestMapping(value = {"/allProducts"}, method = RequestMethod.GET)
     public String allProducts(HttpServletRequest request) {
@@ -226,10 +205,12 @@ public class ProductController {
         System.out.println("product_id");
         System.out.println(product_id);
         System.out.println(votingRepository.checkExistVoteOfIpForProduct(product_id, email));
-        if (votingRepository.checkExistVoteOfIpForProduct(product_id, email)) {
+        if (votingRepository.checkExistVoteOfIpForProduct(product_id, email)==1) {
             this.votingRepository.updateVote(product_id, email, star);
+            this.productRepository.updateRating(product_id);
         } else {
             this.votingRepository.addVote(email, product_id, star);
+            this.productRepository.updateRating(product_id);
         }
     }
 
@@ -258,7 +239,39 @@ public class ProductController {
         }
     }
 
+    @RequestMapping(value = {"/mobilephonesf"}, method = RequestMethod.GET)
+    public String laptopsFilterByPrice(Model model, @RequestParam(value = "from", required = false) Integer from, @RequestParam(value = "to", required = false) Integer to, @RequestParam(value = "location", required = false) String location) {
+        System.out.println(from);
+        System.out.println(to);
+        System.out.println(location);
+        //filter product have id
+        List<ProductAgent> productAgents = this.productAgentRepository.findAll();
 
+        if ((from != null) && (to != null)) {
+            productAgents.removeIf(item -> !(item.getPrice().compareTo(BigDecimal.valueOf(from)) >= 0 &&
+                    item.getPrice().compareTo(BigDecimal.valueOf(to)) <= 0));
+            Set<Integer> ids = new HashSet<>();
+            for (ProductAgent productAgent : productAgents) {
+                ids.add(productAgent.getProduct().getId());
+
+            }
+            //set product detail to page
+            model.addAttribute("products", this.productRepository.findAllByIdIn(ids));
+            return "user/products";
+        }
+        if (location != null) {
+            productAgents.removeIf(item -> (!item.getLocation().equals(location)));
+            Set<Integer> ids = new HashSet<>();
+            for (ProductAgent productAgent : productAgents) {
+                ids.add(productAgent.getProduct().getId());
+
+            }
+            //set product detail to page
+            model.addAttribute("products", this.productRepository.findAllByIdIn(ids));
+            return "user/products";
+        }
+        return "user/products";
+    }
 }
 
 

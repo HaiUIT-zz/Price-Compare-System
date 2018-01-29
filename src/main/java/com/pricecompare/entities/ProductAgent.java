@@ -36,4 +36,7 @@ public class ProductAgent {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(foreignKey = @ForeignKey(name = "products_agents_fk0"))
     Product product;
+
+    @Column(name = "location")
+    private String location;
 }

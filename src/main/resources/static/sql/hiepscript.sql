@@ -71,3 +71,19 @@ UPDATE products SET agent_count = 1 WHERE id = 7;
 
 
 SELECT CASE WHEN email = 'frrfttt' THEN TRUE ELSE FALSE END FROM voting WHERE product_id = 29 AND email = 'frrfttt'
+
+
+INSERT INTO products(name, image, visit_count, rating, agent_count, rating_count, type) VALUES ('Dell Inspiron 3467', 'https://i.imgur.com/C9jV7WR.png', 0,0,0,0,'laptop');
+INSERT INTO products(name, image, visit_count, rating, agent_count, rating_count, type) VALUES ('Dell Vostro 3468', 'https://i.imgur.com/kJfJSZD.png', 0,0,0,0,'laptop');
+INSERT INTO products(name, image, visit_count, rating, agent_count, rating_count, type) VALUES ('Dell Inspiron 5468', 'https://i.imgur.com/SjL3Q3q.jpg', 0,0,0,0,'laptop');
+INSERT INTO products(name, image, visit_count, rating, agent_count, rating_count, type) VALUES ('Dell Inspiron 5567', 'https://i.imgur.com/v8ZdQjv.png', 0,0,0,0,'laptop');
+
+INSERT INTO products_agents(product_id, agent_id, price, url) VALUES (159, 1, 11290000, 'https://www.thegioididong.com/laptop/dell-inspiron-3467-i3-7100u-m20nr21');
+INSERT INTO products_agents(product_id, agent_id, price, url) VALUES (159, 1, 11290000, 'https://fptshop.com.vn/may-tinh-xach-tay/dell-n3467');
+
+SELECT * FROM products WHERE type LIKE 'laptop';
+
+
+SELECT CASE WHEN email = 'wefw1e' THEN TRUE ELSE FALSE END FROM voting WHERE product_id = 25  AND email = 'wefw1e';
+
+UPDATE products SET rating = (SELECT (SELECT SUM(rating) FROM VOTING WHERE product_id = 23) / (SELECT COUNT(*) FROM VOTING WHERE product_id = 23) ) WHERE products.id =23;

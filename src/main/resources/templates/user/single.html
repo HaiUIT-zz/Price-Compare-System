@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!-- js -->
-    <script th:src="@{/user/js/jquery.min.js}"></script>
-    <!-- //js -->
 
+    <!-- js -->
+    <script
+            src="http://code.jquery.com/jquery-2.2.4.min.js"
+            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+            crossorigin="anonymous"></script>
+    <!-- //js -->
 <title>Electronic Store a Ecommerce Online Shopping Category Bootstrap Responsive Website Template | Single Page :: w3layouts</title>
 <!-- for-mobile-apps -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,10 +29,8 @@
 <!-- web fonts --> 
 <link href='//fonts.googleapis.com/css?family=Glegoo:400,700' rel='stylesheet' type='text/css'>
 <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic' rel='stylesheet' type='text/css'>
-<!-- //web fonts --> 
-<!-- for bootstrap working -->
-    <script type="text/javascript"  th:src="@{/user/js/bootstrap-3.1.1.min.js}"></script>
-    <!-- //for bootstrap working -->
+<!-- //web fonts -->
+
 <!-- start-smooth-scrolling -->
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
@@ -40,12 +41,6 @@
 	});
 </script>
 <!-- //end-smooth-scrolling -->
-    <!--<link rel="stylesheet" th:href="@{/css/morris.css}"/>-->
-    <!--<script type="text/javascript" th:src="@{/js/morris.js}"></script>-->
-    <!--<script type="text/javascript" th:src="@{/js/raphael.js}"></script>-->
-
-    <script type="text/javascript" th:src="@{https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js}"></script>
-    <script type="text/javascript" th:src="@{https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js}"></script>
 
 	<!--krajee-->
 	<!-- default styles -->
@@ -54,21 +49,15 @@
 	<!-- optionally if you need to use a theme, then include the theme CSS file as mentioned below -->
 	<link th:href="@{krajee/krajee-svg/theme.css}" media="all" rel="stylesheet" type="text/css" />
 
-	<!-- important mandatory libraries -->
-	<script th:src="@{/krajee/star-rating.js}" type="text/javascript"></script>
-
-	<!-- optionally if you need to use a theme, then include the theme JS file as mentioned below -->
-	<script th:src="@{/krajee/krajee-svg/theme.js}"></script>
-
-    <!---EasyComplete->
-   <!-- JS file -->
-    <script th:src="@{/EasyAutocompleteV135/jquery.easy-autocomplete.min.js}"></script>
     <!-- CSS file -->
     <link rel="stylesheet" th:href="@{/EasyAutocompleteV135/easy-autocomplete.min.css}">
 
     <!-- Additional CSS Themes file - not required-->
     <link rel="stylesheet" th:href="@{/EasyAutocompleteV135/easy-autocomplete.themes.min.css}">
     <!--EasyComplete-->
+    <!--MorrisJS Chart-->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+    <!--End of MorrisJS Chart-->
 
 </head> 
 <body>
@@ -166,17 +155,14 @@
 					});
 					</script>
 				<!-- flexslider -->
-				<!-- zooming-effect -->
-					<script src="../../../../../../../My%20Computer/Downloads/Compressed/electronic_store-web_Free30-01-2017_844071291/web/js/imagezoom.js"></script>
-				<!-- //zooming-effect -->
+
 			</div>
 			<div class="col-md-8 single-right">
                 <h1 th:inline="text">[[${product.name}]]</h1><br>
 
-				<div class="description" style="padding: 10px; margin: 10px">
-                    <label th:inline="text"><i class="fa fa-eye" aria-hidden="true"></i> Visit <strong>[[${product.visit_count}]]</strong></label> <br>
-                    <label th:inline="text"><i class="fa fa-star" aria-hidden="true"></i> Rating <strong>[[${product.rating}]]</strong></label>
-                <br>
+				<div class="description" style="padding: 20px; margin: 20px">
+                    <label th:inline="text"><i class="fa fa-eye" aria-hidden="true"></i> Visit <strong>[[${product.visit_count}]]</strong></label><br>
+                    <label th:inline="text"><i class="fa fa-star" aria-hidden="true"></i> Rating <strong>[[${product.rating}]]</strong></label><br>
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#votingModal" data-whatever="@mdo">Vote</button>
 
                     <div class="modal fade" id="votingModal" tabindex="-1" role="dialog" aria-labelledby="votingModalLabel">
@@ -218,11 +204,13 @@
 	</div> 
 	<div class="additional_info">
 		<div class="container">
+            <div aria-controls="tab_item-1" class="resp-tab-item" role="tab"><span>Compare Price</span></div>
+            <div id="agents-chart"></div>
 			<div class="sap_tabs">	
 				<div id="horizontalTab1" style="display: block; width: 100%; margin: 0px;">
 					<ul>
 						<li class="resp-tab-item" aria-controls="tab_item-0" role="tab"><span>Agents</span></li>
-						<li class="resp-tab-item" aria-controls="tab_item-1" role="tab"><span>Compare Price</span></li>
+
                         <li class="resp-tab-item" aria-controls="tab_item-2" role="tab"><span>Rating</span></li>
 					</ul>
 
@@ -235,6 +223,7 @@
                                     <th>#</th>
                                     <th>Agent</th>
                                     <th>Price</th>
+									<th>Location</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -243,18 +232,14 @@
                                         <td th:text="${iter.index+1}"></td>
                                         <td ><a th:href="${productAgent.url}" th:text="${productAgent.agent.name}"></a></td>
                                         <td th:inline="text">[[${productAgent.price}]] VND</td>
+										<td th:inline="text">[[${productAgent.location}]]</td>
                                     </tr>
                                 </th:block>
                                 </tbody>
                             </table>
                         </div>
 					</div>
-                    <div class="tab-2 resp-tab-content additional_info_grid" aria-labelledby="tab_item-1">
-                        <h3>Compare Agents</h3>
-                        <!--<div id="agents-chart" style="height: 250px;"></div>-->
-                        <canvas id="myChart" style="margin: 20px"></canvas>
-                        <p>Note: Unit of X-axis's value is VND</p>
-                    </div>
+
                     <div class="tab-2 resp-tab-content additional_info_grid" aria-labelledby="tab_item-2">
                         <h3>Rating</h3>
                         <div class="table-responsive">
@@ -291,6 +276,7 @@
 					});
 				});
 			</script>
+
 		</div>
 	</div>
 	<!-- Related Products -->
@@ -626,7 +612,8 @@
 			<div class="clearfix"> </div>
 		</div>
 	</div>
-	<!-- //newsletter -->
+
+   <!-- //newsletter -->
 	<!-- footer -->
 	<div class="footer">
 		<div class="container">
@@ -682,93 +669,105 @@
 			</div>
 		</div>
 	</div>
-	<!-- //footer -->  
-	<!-- cart-js -->
+	<!-- //footer -->
+
+    <!-- for bootstrap working -->
+    <script type="text/javascript"  th:src="@{/user/js/bootstrap-3.1.1.min.js}"></script>
+    <!-- //for bootstrap working -->
+
+    <script type="text/javascript" th:src="@{https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js}"></script>
+    <script type="text/javascript" th:src="@{https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js}"></script>
+
+    <!-- important mandatory libraries -->
+    <script th:src="@{/krajee/star-rating.js}" type="text/javascript"></script>
+
+    <!-- optionally if you need to use a theme, then include the theme JS file as mentioned below -->
+    <script th:src="@{/krajee/krajee-svg/theme.js}"></script>
+
+    <!---EasyComplete->
+   <!-- JS file -->
+    <script th:src="@{/EasyAutocompleteV135/jquery.easy-autocomplete.min.js}"></script>
+
+    <!-- cart-js -->
     <script th:src="@{/user/js/minicart.js}"></script>
-	<script>
-        w3ls.render();
-
-        w3ls.cart.on('w3sb_checkout', function (evt) {
-        	var items, len, i;
-
-        	if (this.subtotal() > 0) {
-        		items = this.items();
-
-        		for (i = 0, len = items.length; i < len; i++) { 
-        		}
-        	}
-        });
-    </script>  
+    <!--MorrisJS Chart-->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+    <!--End of MorrisJS Chart-->
 	<!-- //cart-js -->
     <th:block th:if="${agentPrices}">
         <script th:inline="javascript">
             var agentPrices = /*[[${agentPrices}]]*/ null;
-            console.log(agentPrices);
-            // new Morris.Bar({
-            //     element: 'agents-chart',
-            //     data: _data,
-            //     xkey: 'price',
-            //     ykeys: ['agent', 'price'],
-            //     labels: ['agent', 'price']
+           // var _data = /*[[${agentPrices}]]*/ null;
+            var _data = [{"agent":"Viễn Thông A","price":27000000},{"agent":"www.fptshop.com.vn","price":20000000},{"agent":"www.vienthonga.vn","price":24000000},{"agent":"www.thegioididong.com","price":22000000}];
+            console.log(_data);
+            Morris.Bar({
+                element: 'agents-chart',
+                barSizeRatio:0.1,
+                data: JSON.parse(agentPrices),
+                xkey: 'agent',
+                ykeys: ['price'],
+                labels: ['price']
+            });
+            console.log("111111111111111");
+
+            // var _labels = agentPrices.map(function(item) {
+            //     return item.agent;
             // });
-
-            var _labels = agentPrices.map(function(item) {
-                return item.agent;
-            });
-            var _data = agentPrices.map(function(item) {
-                return item.price;
-            });
-
-            function drawBarValues()
-            {
-                // render the value of the chart above the bar
-                var ctx = this.chart.ctx;
-                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, 'normal', Chart.defaults.global.defaultFontFamily);
-                ctx.fillStyle = this.chart.config.options.defaultFontColor;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
-                this.data.datasets.forEach(function (dataset) {
-                    for (var i = 0; i < dataset.data.length; i++) {
-                        if(dataset.hidden === true && dataset._meta[Object.keys(dataset._meta)[0]].hidden !== false){ continue; }
-                        var model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model;
-                        if(dataset.data[i] !== null){
-                            ctx.fillText(dataset.data[i], model.x - 1, model.y - 5);
-                        }
-                    }
-                });
-            }
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var myBarChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: _labels,
-                    datasets: [{
-                        label: _labels,
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgb(75, 192, 192)',
-                        data: _data,
-                    }]
-                },
-                options: {
-                    legend: {
-                        display: false
-                    },
-                    showInlineValues : true,
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero:true
-                            }
-                        }]
-                    },
-                    animation: {
-                        onProgress: drawBarValues,
-                        onComplete: drawBarValues
-                    },
-                    hover: { animationDuration: 0 }
-
-                }
-            });
+            // var _data = agentPrices.map(function(item) {
+            //     return item.price;
+            // });
+            //
+            // function drawBarValues()
+            // {
+            //     // render the value of the chart above the bar
+            //     var ctx = this.chart.ctx;
+            //     ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, 'normal', Chart.defaults.global.defaultFontFamily);
+            //     ctx.fillStyle = this.chart.config.options.defaultFontColor;
+            //     ctx.textAlign = 'center';
+            //     ctx.textBaseline = 'bottom';
+            //     this.data.datasets.forEach(function (dataset) {
+            //         for (var i = 0; i < dataset.data.length; i++) {
+            //             if(dataset.hidden === true && dataset._meta[Object.keys(dataset._meta)[0]].hidden !== false){ continue; }
+            //             var model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model;
+            //             if(dataset.data[i] !== null){
+            //                 ctx.fillText(dataset.data[i], model.x - 1, model.y - 5);
+            //             }
+            //         }
+            //     });
+            // }
+            // var ctx = document.getElementById('myChart').getContext('2d');
+            // var myBarChart = new Chart(ctx, {
+            //     type: 'bar',
+            //     data: {
+            //         labels: _labels,
+            //         datasets: [{
+            //             label: _labels,
+            //             backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            //             borderColor: 'rgb(75, 192, 192)',
+            //             data: _data,
+            //         }]
+            //     },
+            //     options: {
+            //         legend: {
+            //             display: false
+            //         },
+            //         showInlineValues : true,
+            //         scales: {
+            //             yAxes: [{
+            //                 ticks: {
+            //                     beginAtZero:true
+            //                 }
+            //             }]
+            //         },
+            //         animation: {
+            //             onProgress: drawBarValues,
+            //             onComplete: drawBarValues
+            //         },
+            //         hover: { animationDuration: 0 }
+            //
+            //     }
+            // });
 
 
         </script>
@@ -810,10 +809,12 @@
                 success: function (result) {
                     console.log(result);
 
+
                 },
                 dataType: JSON
             });
             $("#votingModal ").modal('toggle');
+            location.reload();
         });
 
     </script>
