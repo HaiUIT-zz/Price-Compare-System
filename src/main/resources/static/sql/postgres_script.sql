@@ -57,6 +57,21 @@ CREATE TABLE "products" (
 OIDS=FALSE
 );
 
+CREATE TABLE products
+(
+  id           SERIAL       NOT NULL
+    CONSTRAINT products_pk
+    PRIMARY KEY,
+  name         VARCHAR(100) NOT NULL,
+  image        VARCHAR(200),
+  visit_count  INTEGER,
+  rating       NUMERIC(4, 2),
+  agent_count  INTEGER,
+  rating_count INTEGER,
+  type         VARCHAR(256)
+);
+
+
 create TABLE "voting"
 (
   "id" serial not null constraint voting_pkey primary key,
