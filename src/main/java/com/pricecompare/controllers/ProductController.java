@@ -9,6 +9,7 @@ import com.pricecompare.repositories.AgentRepository;
 import com.pricecompare.repositories.VotingRepository;
 import com.pricecompare.repositories.ProductAgentRepository;
 import com.pricecompare.repositories.ProductRepository;
+import jdk.nashorn.internal.runtime.regexp.joni.constants.StringType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,20 +18,27 @@ import com.pricecompare.common.data.pojos.AgentPrice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.sql.SQLData;
 import java.util.*;
 
 @Controller
 public class ProductController {
-    Logger logger = LoggerFactory.getLogger(ProductController.class);
     private final ProductRepository productRepository;
     private final ProductAgentRepository productAgentRepository;
     private final AgentRepository agentRepository;
-
+    Logger logger = LoggerFactory.getLogger(ProductController.class);
     @Autowired
     VotingRepository manageVoteRepository;
+    @Autowired
+    VotingRepository votingRepository;
+    @Autowired
+    private EntityManager em;
 
     @Autowired
     public ProductController(ProductRepository productRepository, ProductAgentRepository productAgentRepository, AgentRepository agentRepository) {
@@ -98,10 +106,7 @@ public class ProductController {
                 break;
             }
         }
-
-
         productAgents.removeIf(element -> element.getProduct().getId() != productId);
-
         if (productAgents.size() != 0) {
             //minimize product agent
             List<AgentPrice> agentPrices = new ArrayList<>();
@@ -111,12 +116,10 @@ public class ProductController {
                 agentPrice.setPrice(productAgent.getPrice());
                 agentPrices.add(agentPrice);
             }
-
             model.addAttribute("productAgents", productAgents);
             System.out.println(new Gson().toJson(agentPrices));
             model.addAttribute("agentPrices", new Gson().toJson(agentPrices));
         }
-
         //add related products list
         if (relatedProducts.size() != 0) {
             model.addAttribute("relatedProducts", relatedProducts);
@@ -188,9 +191,6 @@ public class ProductController {
         return new Gson().toJson(productPOJOS);
     }
 
-    @Autowired
-    VotingRepository votingRepository;
-
     @ResponseBody
     @RequestMapping(value = {"/processRating"}, method = RequestMethod.POST)
     public void processRating(ServletRequest servletRequest) {
@@ -205,7 +205,7 @@ public class ProductController {
         System.out.println("product_id");
         System.out.println(product_id);
         System.out.println(votingRepository.checkExistVoteOfIpForProduct(product_id, email));
-        if (votingRepository.checkExistVoteOfIpForProduct(product_id, email)==1) {
+        if (votingRepository.checkExistVoteOfIpForProduct(product_id, email) == 1) {
             this.votingRepository.updateVote(product_id, email, star);
             this.productRepository.updateRating(product_id);
         } else {
@@ -226,12 +226,37 @@ public class ProductController {
     }
 
     @RequestMapping(value = {"/mobilephones/find"}, method = RequestMethod.POST)
-    public String findProduct(Model model, ServletRequest servletRequest) {
-        String keyword = servletRequest.getParameter("Search");
+    public String findProduct(Model model,
+//                              ServletRequest servletRequest,
+                              @RequestParam(value = "page", required = false) Integer page,
+                              @RequestParam(value = "Search", required = false) String search) {
+//        String keyword = servletRequest.getParameter("Search");
+        String keyword = search;
+        System.out.println("=====================================================Keyword:" + keyword);
         if (keyword == null && keyword.isEmpty()) {
             return "redirect:/mobilephones";
         } else {
             List<Product> products = this.productRepository.findProduct("%" + keyword + "%");
+
+            //process paging
+            int size = products.size();
+            final int productPerPage = 6;
+            int numberOfPage1 = products.size() / productPerPage;
+            if (numberOfPage1 * productPerPage < products.size()) {
+                numberOfPage1++;
+            }
+            int start = productPerPage * (page - 1);
+            int end = start + productPerPage;
+            if (end > size) {
+                end = size;
+            }
+            products = products.subList(start, end);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("products", products);
+            model.addAttribute("numberOfPage", numberOfPage1);
+            //end of process paging
+
+
             int numberOfPage = products.size() / 9;
             model.addAttribute("numberOfPage", numberOfPage);
             model.addAttribute("products", products);
@@ -240,10 +265,10 @@ public class ProductController {
     }
 
     @RequestMapping(value = {"/mobilephonesf"}, method = RequestMethod.GET)
-    public String laptopsFilterByPrice(Model model, @RequestParam(value = "from", required = false) Integer from, @RequestParam(value = "to", required = false) Integer to, @RequestParam(value = "location", required = false) String location) {
-        System.out.println(from);
-        System.out.println(to);
-        System.out.println(location);
+    public String laptopsFilterByPrice(Model model,
+                                       @RequestParam(value = "from", required = false) Integer from,
+                                       @RequestParam(value = "to", required = false) Integer to,
+                                       @RequestParam(value = "location", required = false) String location) {
         //filter product have id
         List<ProductAgent> productAgents = this.productAgentRepository.findAll();
 
@@ -253,7 +278,6 @@ public class ProductController {
             Set<Integer> ids = new HashSet<>();
             for (ProductAgent productAgent : productAgents) {
                 ids.add(productAgent.getProduct().getId());
-
             }
             //set product detail to page
             model.addAttribute("products", this.productRepository.findAllByIdIn(ids));
@@ -264,13 +288,123 @@ public class ProductController {
             Set<Integer> ids = new HashSet<>();
             for (ProductAgent productAgent : productAgents) {
                 ids.add(productAgent.getProduct().getId());
-
             }
             //set product detail to page
             model.addAttribute("products", this.productRepository.findAllByIdIn(ids));
             return "user/products";
         }
         return "user/products";
+    }
+
+
+    /**
+     * Get products
+     *
+     * @param model
+     * @param category
+     * @param keyword
+     * @param region
+     * @param from
+     * @param to
+     * @return
+     */
+    @RequestMapping(value = {"/products"})
+    public String getProducts(Model model,
+                              @RequestParam(value = "category", required = false) String category,
+                              @RequestParam(value = "keyword", required = false) String keyword,
+                              @RequestParam(value = "region", required = false) String region,
+                              @RequestParam(value = "from", required = false) Integer from,
+                              @RequestParam(value = "to", required = false) Integer to,
+                              @RequestParam(value = "page", required = false) Integer page) {
+        List<Product> products;
+        keyword=keyword.equals("")?null:keyword;
+        category=category.equals("")?null:category;
+        region=region.equals("")?null:region;
+
+        if (category != null) {
+            if (region != null) {
+                if (from != null && to != null) {
+                    products = this.productRepository.getProductsByLocationPrice(region, from, to);
+                } else {
+                    products = this.productRepository.getProductsByLocation(region);
+                }
+            } else {
+                if (from != null && to != null) {
+                    products = this.productRepository.getProductsByPrice(from, to);
+                } else {
+                    products = this.productRepository.findAll();
+                }
+            }
+        } else {
+            if (region != null) {
+                if (from != null && to != null) {
+                    products = this.productRepository.getProductsByLocationPriceKeyword(region, keyword, from, to);
+                } else {
+                    products = this.productRepository.getProductsByLocationKeyword(region, keyword);
+                }
+            } else {
+                if (from != null && to != null) {
+                    products = this.productRepository.getProductsByPriceKeyword(keyword, from, to);
+                } else {
+                    products = this.productRepository.getProductsByKeyword(keyword);
+                }
+            }
+        }
+        //process paging
+        int size = products.size();
+        final int productPerPage = 9;
+        int numberOfPage = products.size() / productPerPage;
+        if (numberOfPage * productPerPage < products.size()) {
+            numberOfPage++;
+        }
+        int start = productPerPage * (page - 1);
+        int end = start + productPerPage;
+        if (end > size) {
+            end = size;
+        }
+        products = products.subList(start, end);
+        model.addAttribute("products", products);
+        model.addAttribute("numberOfPage", numberOfPage);
+        //end of process paging
+        if (category != null) {
+            model.addAttribute("category", category);
+        }
+        if (keyword != null) {
+            model.addAttribute("keyword", keyword);
+        }
+        if (region != null) {
+            model.addAttribute("region", region);
+        }
+        if (from != null) {
+            model.addAttribute("from", from);
+        }
+        if (to  != null) {
+            model.addAttribute("to", to);
+        }
+        model.addAttribute("currentPage", page);
+
+        //process products top rating
+        List<Product> _products = this.productRepository.findAll();
+        List<Product> productsTopRating = new ArrayList<>();
+        List<Product> productsTopRatingTemp = _products;
+        //process filter products have rating in top 3
+        productsTopRatingTemp.sort((Product _product, Product product2) -> {
+            if (_product.getRating() > product2.getRating())
+                return -1;
+            if (_product.getRating() < product2.getRating())
+                return 1;
+            return 0;
+        });
+        int indexLoopTopProduct = 0;
+        for (Product product1 : productsTopRatingTemp) {
+            if (indexLoopTopProduct == 5) {
+                break;
+            }
+            productsTopRating.add(product1);
+            indexLoopTopProduct++;
+        }
+        model.addAttribute("productsTopRating", productsTopRating);
+        return "user/_products";
     }
 }
 
